@@ -3,22 +3,30 @@
   "render_controllers": {
     "controller.render.bubble": {
       "geometry": "Geometry.bubble",
-      "materials": [ { "*": "Material.default" } ],
-      "textures": [ "Texture.default" ],
-    "is_hurt_color":{
-        "r":"0.0",
-        "g":"0.0",
-        "b":"0.0",
-        "a":"0.0"
-    },
-    "on_fire_color":{
-        "r":"0.0",
-        "g":"0.0",
-        "b":"0.0",
-        "a":"0.0"
-    },
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "is_hurt_color": {
+        "r": "0.0",
+        "g": "0.0",
+        "b": "0.0",
+        "a": "0.0"
+      },
+      "on_fire_color": {
+        "r": "0.0",
+        "g": "0.0",
+        "b": "0.0",
+        "a": "0.0"
+      },
       "part_visibility": [
-        { "*": true }
+        {
+          "*": true
+        }
       ]
     }
   }

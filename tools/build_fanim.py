@@ -111,6 +111,13 @@ for k, rc in prc["render_controllers"].items():
     prc["render_controllers"][k] = new
 dump(prc, prc_path)
 
+# The bubble model has no cubes but was bound to the skin texture (Texture.default);
+# keep the player's (possibly Marketplace) skin texture on the player body only.
+bub_path = os.path.join(out, "render_controllers/bubble.json")
+bub = load(bub_path)
+bub["render_controllers"]["controller.render.bubble"]["textures"] = ["Texture.empty"]
+dump(bub, bub_path)
+
 # --- 6. Back items + cape: one definition per option, in every subpack --------
 sp_default = os.path.join(orig, "subpacks/default/render_controllers")
 back_rcs, cape_rcs = {}, {}
