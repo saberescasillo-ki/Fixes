@@ -1,0 +1,17 @@
+{
+    "format_version": 1,
+    "header": {
+      "description": "§l§6normal animations §4§lBy §r§l§o§3KID_SKY",
+        "name": "§l§6Player Action Optimization §r§l§o§bOriginal 0.4",
+        "uuid": "5c363e9b-b8c0-4a89-9f80-58404dfd22b0",
+        "version": [0, 4, 1]
+    },
+    "modules": [
+        {
+            "description": "授权使用加QQ:241127915",
+            "type": "resources",
+            "uuid": "ae710544-e31e-4267-8bd8-76279525d213",
+            "version": [0, 4, 1]
+        }
+    ]
+}
