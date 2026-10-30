@@ -1,0 +1,1326 @@
+{
+	"format_version" : "1.10.0",
+	"animation_controllers" : {
+		"controller.animation.player.bob" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ {"bob":"!v.is_first_person && !q.is_sleeping && !q.is_riding"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!q.is_alive || variable.is_holding_spyglass || variable.is_tooting_goat_horn || variable.is_using_brush || v.map_holding || v.holding_broadsword || v.holding_spear || v.holding_halbert || v.holding_halbert2 || v.holding_greatsword || query.modified_move_speed > 0.08 || q.is_sneaking || v.attack || q.is_using_item || q.item_is_charged || !q.is_on_ground"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "q.is_alive && !variable.is_holding_spyglass && !variable.is_tooting_goat_horn && !variable.is_using_brush && !v.map_holding && !v.holding_broadsword && !v.holding_spear && !v.holding_halbert && !v.holding_halbert2 && !v.holding_greatsword && query.modified_move_speed < 0.08 && !q.is_sneaking && !v.attack && !q.is_using_item && !q.item_is_charged && q.is_on_ground"
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.player.fly.bob" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ "fly_bob" ],
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"default" : "!q.is_alive || !query.is_on_screen || query.is_sleeping || variable.is_first_person || query.is_sprinting || query.is_in_water || query.is_riding || query.is_gliding || query.is_on_ground || query.modified_move_speed > 0.99"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"1" : "q.is_alive && query.is_on_screen && !query.is_sleeping && !variable.is_first_person && !query.is_sprinting && !query.is_in_water && !query.is_riding && !query.is_gliding && !query.is_on_ground && query.modified_move_speed < 0.99"
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.player.fly.move" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ "fly_move" ],
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"default" : "!q.is_alive || !query.is_on_screen || query.is_sleeping || variable.is_first_person || query.is_in_water || query.is_riding || query.is_gliding || query.is_on_ground || query.modified_move_speed<0.99 || q.is_sprinting"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"1" : "q.is_alive && query.is_on_screen && !query.is_sleeping && !variable.is_first_person && !query.is_in_water && !query.is_riding && !query.is_gliding && !query.is_on_ground && query.modified_move_speed>0.99 && !q.is_sprinting"
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.player.fly.sprint" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ "fly_sprint" ],
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"default" : "!q.is_alive || !query.is_on_screen || query.is_sleeping || variable.is_first_person || query.is_in_water || query.is_riding || query.is_gliding || query.is_on_ground || query.modified_move_speed<0.99 || !q.is_sprinting"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"1" : "q.is_alive && query.is_on_screen && !query.is_sleeping && !variable.is_first_person && !query.is_in_water && !query.is_riding && !query.is_gliding && !query.is_on_ground && query.modified_move_speed>0.99 && q.is_sprinting"
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.player.walk" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ {"walk.arms":"!v.map_holding && !v.is_first_person && !v.broadsword_slow"},{"walk.legs":"!v.broadsword_slow"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "v.is_first_person || query.is_using_item || query.modified_move_speed < 0.08 || q.is_sprinting ||  !query.is_on_ground || query.is_sneaking || query.is_riding || !query.is_alive || query.is_sleeping || query.is_gliding"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "!v.is_first_person && !query.is_using_item && query.modified_move_speed > 0.08 && !q.is_sprinting && query.is_on_ground && !query.is_sneaking && !query.is_riding && !query.is_in_water && query.is_alive && !query.is_sleeping && !query.is_gliding"
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.player.run" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ {"run.arms":"!v.map_holding && !v.is_first_person"},{"run.legs":"!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "query.modified_move_speed < 0.3 || !query.is_sprinting || !query.is_on_ground || query.is_sneaking || query.is_riding || !query.is_alive || query.is_sleeping || query.is_gliding"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "query.modified_move_speed > 0.3 && query.is_sprinting && query.is_on_ground && !query.is_sneaking && !query.is_riding && !query.is_in_water && query.is_alive && !query.is_sleeping && !query.is_gliding"
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.player.sneak" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ {"sneak.arms":"!v.map_holding && !v.is_first_person && !v.swim_idle && !v.holding_halbert2 && !v.holding_katana"},{"sneak.legs":"!v.is_first_person && !v.swim_idle"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "(!query.is_sneaking || query.modified_move_speed < 0.01 || query.is_sleeping || query.is_gliding || !query.is_sneaking || !query.is_on_ground) && (!query.is_in_water || query.is_swimming)"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "(query.is_sneaking && query.modified_move_speed > 0.01 && !query.is_sleeping && !query.is_gliding && query.is_sneaking && query.is_on_ground) || (query.is_in_water && !query.is_swimming)"
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.player.move_using_items" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ "sneak.legs" ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!v.move_using_items|| query.modified_move_speed < 0.08 "
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "v.move_using_items && query.modified_move_speed > 0.08 "
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.player.broadsword_slow" : {
+			"initial_state" : "default",
+			"states" : {
+				"1" : {
+					"animations" : [ "sneak.legs" ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!v.broadsword_slow || query.modified_move_speed < 0.01 || q.is_sneaking"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "v.broadsword_slow && query.modified_move_speed > 0.01 && !q.is_sneaking "
+						}
+						]
+					}
+				}
+			},
+			"controller.animation.use_helmet": {
+			  "states": {
+				"2": {
+				  "animations": [{"use_helmet":"q.is_alive"}],
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "1": "query.is_item_name_any('slot.armor.head', 0, '')"
+					}
+				  ]
+				},
+				"default": {
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "2": "!query.is_item_name_any('slot.armor.head', 0, '')"
+					}
+				  ]
+				},
+				"1": {
+				  "animations": ["use_helmet2"],
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "default": "query.all_animations_finished"
+					}
+				  ]
+				}
+			  }
+			},
+			"controller.animation.use_armor": {
+			  "states": {
+				"2": {
+				  "animations": [{"use_armor":"q.is_alive"}],
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "1": "query.is_item_name_any('slot.armor.chest', 0, '')"
+					}
+				  ]
+				},
+				"default": {
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "2": "!query.is_item_name_any('slot.armor.chest', 0, '')"
+					}
+				  ]
+				},
+				"1": {
+				  "animations": ["use_armor"],
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "default": "query.all_animations_finished"
+					}
+				  ]
+				}
+			  }
+			},
+			"controller.animation.use_legs": {
+			  "states": {
+				"2": {
+				  "animations": [{"use_legs":"q.is_alive"}],
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "1": "query.is_item_name_any('slot.armor.legs', 0, '')"
+					}
+				  ]
+				},
+				"default": {
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "2": "!query.is_item_name_any('slot.armor.legs', 0, '')"
+					}
+				  ]
+				},
+				"1": {
+				  "animations": ["use_legs"],
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "default": "query.all_animations_finished"
+					}
+				  ]
+				}
+			  }
+			},
+			"controller.animation.use_boots": {
+			  "states": {
+				"2": {
+				  "animations": [{"use_boots":"q.is_alive"}],
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "1": "query.is_item_name_any('slot.armor.feet', 0, '')"
+					}
+				  ]
+				},
+				"default": {
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "2": "!query.is_item_name_any('slot.armor.feet', 0, '')"
+					}
+				  ]
+				},
+				"1": {
+				  "animations": ["use_boots"],
+				  "blend_transition": 0,
+				  "transitions": [
+					{
+					  "default": "query.all_animations_finished"
+					}
+				  ]
+				}
+			  }
+			},
+			"controller.animation.player.fishing":{
+				 "states":{
+					"default":{
+					   "transitions":[
+						  {
+							 "1":"query.get_equipped_item_name == 'fishing_rod' && !q.is_moving"
+						  }
+					   ],
+					   "blend_transition":0.4
+					},
+					"1":{
+					   "animations":[
+						  "fish"
+					   ],
+					   "transitions":[
+						  {
+							 "default":"query.get_equipped_item_name != 'fishing_rod' || q.is_moving"
+						  }
+					   ],
+					   "blend_transition":0.2
+					}
+			  }
+		   },
+			  "controller.animation.player.fishing1":{
+				 "states":{
+					"default":{
+					   "transitions":[
+						  {
+							 "2":"query.get_equipped_item_name == 'fishing_rod' && query.item_in_use_duration > 0"
+						  }
+					   ]
+					},
+					"2":{
+					   "animations":[
+						  "fish1"
+					   ],
+					   "transitions":[
+						  {
+							 "default":"query.all_animations_finished || query.get_equipped_item_name != 'fishing_rod'"
+						  }
+					   ]
+					}
+				 }
+			  },
+			"controller.animation.fanim.crossbow" : {
+			"initial_state" : "default",
+			"states" : {
+				"charge" : {
+					"animations" : [ "third_person_crossbow_equipped" ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "query.get_equipped_item_name != 'crossbow' || (query.item_remaining_use_duration <= 0.0 && !query.item_is_charged)"
+						},
+						{
+							"hold" : "query.item_is_charged"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"hold" : "query.item_is_charged"
+						},
+						{
+							"charge" : "query.item_remaining_use_duration > 0.0"
+						}
+					]
+				},
+				"hold" : {
+					"animations" : [ "crossbow_hold" ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "query.get_equipped_item_name != 'crossbow' || (query.item_remaining_use_duration <= 0.0 && !query.item_is_charged)"
+						},
+						{
+							"charge" : "query.item_remaining_use_duration > 0.0"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.custom_holding" : {
+			"initial_state" : "default",
+			"states" : {
+				"right" : {
+					"animations" : [ {"45r":"!v.is_first_person"},{"45l":"!v.is_first_person && v.map_holding_left"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!v.map_holding_right"
+						},
+						{
+							"left" : "v.map_holding_left"
+						},
+						{
+							"both" : "v.map_holding"
+						}
+					]
+				},
+				"left" : {
+					"animations" : [ {"45l":"!v.is_first_person && !q.item_is_charged && !v.using_bow"},{"45r":"!v.is_first_person && v.map_holding_right"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!v.map_holding_left"
+						},
+						{
+							"right" : "v.map_holding_right"
+						},
+						{
+							"both" : "v.map_holding"
+						}
+					]
+				},
+				"both" : {
+					"animations" : [ {"55b":"!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!v.map_holding"
+						},
+						{
+							"right" : "v.map_holding_right"
+						},
+						{
+							"left" : "v.map_holding_left"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"right" : "v.map_holding_right"
+						},
+						{
+							"left" : "v.map_holding_left"
+						},
+						{
+							"both" : "v.map_holding"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.holding" : {
+			"initial_state" : "default",
+			"states" : {
+				"hr" : {
+					"animations" : [ {"hr":"!v.is_first_person && !v.holding_sword && !v.map_holding_right && !v.hc && !v.map_holding && (query.item_remaining_use_duration <= 0.0 && !q.item_is_charged) && !v.using_bow && !v.holding_spear && !v.holding_broadsword"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.is_holding_right"
+						}
+					]
+				},
+				"default" : {
+					"animations" : [ {"default_items":"!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"hr" : "variable.is_holding_right"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.item.sword" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "variable.holding_sword"
+						},
+						{
+							"2" : "variable.holding_katana"
+						}
+					]
+				},
+				"1" : {
+					"animations" : [ {"item.sword":"!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "query.all_animations_finished && !variable.holding_sword"
+						},
+						{
+							"2" : "variable.holding_katana"
+						}
+					]
+				},
+				"2" : {
+					"animations" : [ {"item.katana":"!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "query.all_animations_finished && !variable.holding_katana"
+						},
+						{
+							"1" : "variable.holding_sword"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.holding_spyglass" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"holding_spyglass":"!v.is_first_person"} ],
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"default" : "!variable.is_holding_spyglass"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"7" : "variable.is_holding_spyglass"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.sneaking" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"sneaking": "!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!q.is_sneaking || v.holding_katana || v.holding_broadsword || v.kneeling1 || v.sitting1 || v.flowerr || q.is_crawling || v.sitting_new1 || v.sleep1"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"7" : "query.is_sneaking && !v.holding_katana && !v.holding_broadsword && !v.kneeling1 && !v.sitting1 && !v.flowerr && !q.is_crawling && !v.sitting_new1 && !v.sleep1"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.sneaking_flower" : {
+			"initial_state" : "default",
+			"states" : {
+				"8" : {
+					"animations" : [ {"flower": "!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.flower || !q.is_sneaking || query.modified_move_speed > 0.08"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"8" : "variable.flower && q.is_sneaking && !q.is_sleeping && query.modified_move_speed < 0.08"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.kneeling" : {
+			"initial_state" : "default",
+			"states" : {
+				"8" : {
+					"animations" : [ {"kneeling": "!v.is_first_person"} ],
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"default" : "!variable.kneeling || !q.is_sneaking || query.modified_move_speed > 0.08"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"8" : "variable.kneeling && q.is_sneaking && !q.is_sleeping && query.modified_move_speed < 0.08"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.sleep" : {
+			"initial_state" : "default",
+			"states" : {
+				"8" : {
+					"animations" : [ 
+					{"sleep": "!v.is_first_person && v.roll == 1"},
+					{"sleep1": "!v.is_first_person && v.roll == 2"}
+					],
+					"blend_transition": 0.3,
+					"transitions" : [
+						{
+							"default" : "!variable.sleep || !q.is_sneaking || query.modified_move_speed > 0.08"
+						}
+					]
+				},
+				"default" : {
+					"on_entry": ["v.roll = math.random_integer(1, 2);"],
+					"on_exit": [ "v.roll = math.random_integer(1, 2);"],
+					"blend_transition": 0.4,
+					"transitions" : [
+						{
+							"8" : "variable.sleep && q.is_sneaking && !q.is_sleeping && query.modified_move_speed < 0.08"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.sitting_new" : {
+			"initial_state" : "default",
+			"states" : {
+				"8" : {
+					"animations" : [ 
+					{"sitting1": "!v.is_first_person && v.roll == 1"},
+					{"sitting5": "!v.is_first_person && v.roll == 2"},
+					{"sitting6": "!v.is_first_person && v.roll == 3"}
+					],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.sitting_new || !q.is_sneaking || query.modified_move_speed > 0.08"
+						}
+					]
+				},
+				"default" : {
+					"on_entry": ["v.roll = math.random_integer(1, 3);"],
+					"on_exit": [ "v.roll = math.random_integer(1, 3);"],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"8" : "variable.sitting_new && q.is_sneaking && !q.is_sleeping && query.modified_move_speed < 0.08"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.sitting" : {
+			"initial_state" : "default",
+			"states" : {
+				"8" : {
+					"animations" : [ 
+					{"sitting2": "!v.is_first_person && v.roll == 1"},
+					{"sitting3": "!v.is_first_person && v.roll == 2"},
+					{"sitting4": "!v.is_first_person && v.roll == 3"}
+					],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.sitting || !q.is_sneaking || query.modified_move_speed > 0.08"
+						}
+					]
+				},
+				"default" : {
+					"on_entry": ["v.roll = math.random_integer(1, 3);"],
+					"on_exit": [ "v.roll = math.random_integer(1, 3);"],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"8" : "variable.sitting && q.is_sneaking && !q.is_sleeping && query.modified_move_speed < 0.08"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.attack.positions" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"attack.positions": "!v.is_first_person"} ],
+					"blend_transition": 0.0,
+					"transitions" : [
+						{
+							"default" : "!variable.attack_time >= 0.0"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.0,
+					"transitions" : [
+						{
+							"7" : "variable.attack_time >= 0.0"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.attack.rotations" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"attack.rotations": "!v.is_first_person"} ],
+					"blend_transition": 0.0,
+					"transitions" : [
+						{
+							"default" : "!variable.attack_time >= 0.0"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.0,
+					"transitions" : [
+						{
+							"7" : "variable.attack_time >= 0.0"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.humanoid.brushing" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"brushing": "!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.is_using_brush"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"7" : "variable.is_using_brush"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.humanoid.holding_brush" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"holding_brush": "!v.is_first_person"} ],
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"default" : "query.get_equipped_item_name != 'brush'"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"7" : "query.get_equipped_item_name == 'brush'"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.humanoid.tooting_goat_horn" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"tooting_goat_horn": "!v.is_first_person"} ],
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"default" : "!variable.is_tooting_goat_horn"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"7" : "variable.is_tooting_goat_horn"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.bow_equipped" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"third_person_bow_equipped": "!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.using_bow"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"7" : "variable.using_bow"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.shield_block_main_hand" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"shield_block_main_hand": "!v.is_first_person && !q.is_riding"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.block_main_hand"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"7" : "variable.block_main_hand"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.shield_block_off_hand" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"shield_block_off_hand": "!v.is_first_person && !v.flower && !q.is_riding"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.block_off_hand"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"7" : "variable.block_off_hand && !v.flower"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.fanim.brandish_spear" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"7" : "query.item_remaining_use_duration > 0.0 && v.trident"
+						}
+					]
+				},
+				"7" : {
+					"animations" : [ {"brandish_spear": "!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+												{
+							"default" : "query.item_remaining_use_duration <= 0.0 || !v.trident"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.holding_compass" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"70r": "!v.is_first_person && !query.is_riding"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!variable.hc"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"7" : "variable.hc"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.holding_sword" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"holding_sword": "!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_swimming"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!q.is_sprinting || !v.holding_sword"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"7" : "query.all_animations_finished && q.is_sprinting && v.holding_sword"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.holding_axe" : {
+			"initial_state" : "default",
+			"states" : {
+				"7" : {
+					"animations" : [ {"holding_axe": "!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_swimming && !v.attack_time > 0.3"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!q.is_sprinting || !v.holding_axe"
+						},
+						{
+							"1" : "!variable.is_first_person && v.holding_axe && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [
+						{"axe.attack.run":"q.is_sprinting"}
+					],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && v.holding_axe && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !v.holding_axe || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						{"sword.attack1":"q.is_sprinting"}
+					],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && v.holding_axe && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !v.holding_axe || !v.attack_time)"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"7" : "q.all_animations_finished && q.is_sprinting && v.holding_axe"
+						},
+						{
+							"1" : "!variable.is_first_person && v.holding_axe && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && v.holding_axe && v.attack_time"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.holding_trident" : {
+			"initial_state" : "default",
+			"states" : {
+				"8" : {
+					"animations" : [ {"holding_trident": "!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_swimming"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "!q.is_sprinting || !v.trident"
+						}
+					]
+				},
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"8" : "q.is_sprinting && v.trident"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.ender": {
+			  "initial_state": "default",
+			  "states": {
+				"default": {
+				  "transitions": [ { "ender": "query.get_equipped_item_name == 'dragon_egg' || query.get_equipped_item_name == 'ender_claymore'" } ]
+				},
+				"ender": {
+				  "particle_effects": [ { "effect": "ender" } ],
+				  "transitions": [ { "default": "query.get_equipped_item_name != 'dragon_egg' && query.get_equipped_item_name != 'ender_claymore'" } ]
+			}
+		  }
+		},
+		"controller.animation.fear": {
+			"initial_state": "default",
+			"states": {
+			  "default": {
+				"transitions": [ { "fear": "query.get_equipped_item_name == 'sword_of_fear'" } ]
+			  },
+			  "fear": {
+				"particle_effects": [ { "effect": "fear" } ],
+				"transitions": [ { "default": "query.get_equipped_item_name != 'sword_of_fear'" } ]
+		  }
+		}
+	  },
+		"controller.animation.sparkle": {
+			  "initial_state": "default",
+			  "states": {
+				"default": {
+				  "transitions": [ { "1": "query.get_equipped_item_name == 'nether_star'" } ]
+				},
+				"1": {
+				  "particle_effects": [ { "effect": "sparkle" } ],
+				  "transitions": [ { "default": "query.get_equipped_item_name != 'nether_star'" } ]
+			}
+		  }
+		},
+		"controller.animation.heart": {
+			  "initial_state": "default",
+			  "states": {
+				"default": {
+				  "transitions": [ { "heart": "q.is_sneaking && v.flower1" } ]
+				},
+				"heart": {
+				  "particle_effects": [ { "effect": "heart" } ],
+				  "transitions": [ { "default": "!v.flower1" } ]
+			}
+		  }
+		},
+		"controller.animation.wither.heart": {
+			  "initial_state": "default",
+			  "states": {
+				"default": {
+				  "transitions": [ { "heart": "q.is_sneaking && v.wither.flower" } ]
+				},
+				"heart": {
+				  "particle_effects": [ { "effect": "wither.heart" } ],
+				  "transitions": [ { "default": "!v.wither.flower" } ]
+			}
+		  }
+		},
+		"controller.animation.glide": {
+			  "initial_state": "default",
+			  "states": {
+				"default": {
+				  "transitions": [ { "glide": "q.is_gliding && query.ground_speed>13" } ]
+				},
+				"glide": {
+				  "particle_effects": [ { "effect": "glide" } ],
+				  "transitions": [ { "default": "!q.is_gliding || query.ground_speed<13" } ]
+			}
+		  }
+		},
+		"controller.animation.sprnt": {
+			  "initial_state": "default",
+			  "states": {
+				"default": {
+				  "transitions": [ { "1": "!q.is_gliding && !q.is_in_water && q.is_on_ground &&  q.is_sprinting && q.is_moving" } ]
+				},
+				"1": {
+				  "particle_effects": [ { "effect": "speed" } ],
+				  "transitions": [ { "default": "!q.is_on_ground || q.is_in_water || !q.is_sprinting || !q.is_moving" } ]
+			}
+		  }
+		},
+		"controller.animation.fire_smoke": {
+			  "initial_state": "default",
+			  "states": {
+				"default": {
+				  "transitions": [ { "1": "q.is_on_fire" } ]
+				},
+				"1": {
+				  "particle_effects": [ { "effect": "fire_smoke" } ],
+				  "transitions": [ { "default": "!q.is_on_fire" } ]
+			}
+		  }
+		},
+		"controller.animation.jump": {
+			"states": {
+				"default": {
+					"transitions": [
+						{
+							"jump1": "q.is_jumping"
+						},
+						{
+							"jump2": "q.is_jumping"
+						}
+					],
+					"blend_transition": 0.24
+				},
+				"jump1": {
+					"animations": [
+						{"jump1":"!q.is_in_water && !v.is_first_person"}
+					],
+					"blend_transition": 0.24,
+					"transitions": [
+						{
+							"jump2": "q.is_jumping && q.is_on_ground"
+						},
+						{
+							"default": "!q.is_jumping"
+						}
+					]
+				},
+				"jump2": {
+					"animations": [
+						{"jump2":"!q.is_in_water && !v.is_first_person"}
+					],
+					"blend_transition": 0.24,
+					"transitions": [
+						{
+							"jump1": "q.is_jumping && q.is_on_ground"
+						},
+						{
+							"default": "!q.is_jumping"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.fall": {
+			"states": {
+				"default": {
+					"blend_transition": 0.4,
+					"transitions": [
+						{
+							"1" : "!q.is_first_person && !query.is_on_ground && query.ground_speed>13 && !query.is_sprinting && !query.is_in_water && !query.is_gliding"
+						},
+						{
+						    "2" : "!q.is_first_person && !query.is_on_ground && query.ground_speed>13 && !query.is_sprinting && !query.is_in_water && query.is_gliding"
+						}
+					]
+				},
+				"1": {
+					"animations": [
+						{"fall":"!v.is_first_person && !v.holding_broadsword"}
+					],
+					"blend_transition": 0.4,
+					"transitions": [
+						{
+							"2": "!q.is_first_person && query.is_on_ground && query.ground_speed<13 && !query.is_in_water"
+						},
+						{
+							"default": "!q.is_first_person && (!query.is_on_ground && query.ground_speed<13) || query.is_in_water"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						{"ground":"!v.is_first_person && !q.is_gliding && !v.holding_broadsword"}
+					],
+					"blend_transition": 1.4,
+					"transitions": [
+						{
+							"default": "!q.is_first_person && query.is_on_ground || query.ground_speed || query.is_sprinting && !query.is_in_water"
+						}
+					]
+				}
+			}
+		},
+//		"controller.animation.climb": {
+//			"states": {
+//				"default": {
+//					"blend_transition": 0.2,
+//					"transitions": [
+//						{
+//							"1" : "variable.climb"
+//						}
+//					]
+//				},
+//				"1": {
+//					"animations": [
+//						"climb",
+//						{
+//						"climb": "!variable.map_holding"
+//						}
+//					],
+//					"blend_transition": 0.2,
+//					"transitions": [
+//						{
+//							"default": "!variable.climb"
+//						}
+//					]
+//				}
+//			}
+//		},
+		"controller.animation.turu": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "variable.turu"
+						}
+					]
+				},
+				"1": {
+					"animations": [ {"turu": "!v.is_first_person && !q.is_moving && !v.holding_broadsword && !v.holding_spear && !v.holding_halbert"} ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "!v.turu"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.swim.idle": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "q.is_in_water && !q.is_swimming && !q.is_on_ground && !q.is_using_item"
+						}
+					]
+				},
+				"1": {
+					"animations": [ {"swim.idle":"!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "!q.is_in_water || q.is_swimming || q.is_on_ground || q.is_using_item"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.swim.ground": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "q.is_in_water && !q.is_swimming && q.is_on_ground && q.is_moving"
+						}
+					]
+				},
+				"1": {
+					"animations": [ {"sneak.arms":"!v.is_first_person"},{"sneak.legs":"!v.is_first_person"} ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "!q.is_in_water || q.is_swimming || !q.is_on_ground || !q.is_moving"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.dead": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "q.all_animations_finished && !query.is_alive && !query.is_sleeping && !query.is_gliding && query.is_on_screen"
+						}
+					]
+				},
+				"1": {
+					"animations": [ "dead" ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"2": "query.all_animations_finished && q.is_alive"
+						}
+					]
+				},
+				"2": {
+					"animations": [ "emerge" ],
+					"blend_transition": 0.3,
+					"transitions": [
+						{
+							"default": "query.all_animations_finished && (query.is_alive || query.is_sleeping || query.is_gliding || !query.is_on_screen)"
+						}
+					]
+				}
+			}
+		}
+	}
+}

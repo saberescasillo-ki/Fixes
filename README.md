@@ -1,6 +1,50 @@
 # Fixes
 
-## Player Action Optimization (KID_SKY) – actualizado
+## FAnimation Update 7 (fieryabyss × Fiery Combat) – arreglado
+
+- `FAnimation/` – el pack arreglado. `dist/FAnimation_Update7_fix_0.1.0.mcpack` para instalar.
+- `FAnimation_original/` – el pack tal como llegó.
+- `tools/build_fanim.py` lo genera desde el original; `tools/check_fanim.py` valida referencias.
+
+### Capa: opciones (botón ⚙ del pack → subpacks)
+
+| Opción | Capa custom de FAnimation | Espadas/herramientas en la espalda |
+|---|---|---|
+| **Default** (preseleccionada) | Sí, **solo si tu skin no trae capa** | Sí |
+| **Capa de tu skin / Marketplace** | No, nunca | Sí |
+| Sin accesorios en la espalda | Solo si tu skin no trae capa | No |
+| Sin capa custom ni accesorios | No, nunca | No |
+
+La capa de tu skin (marketplace, Minecoins, Creador de Personajes) usa la geometría
+segmentada del pack, así que conserva la animación de ondeo.
+
+### Errores corregidos
+
+| Problema | Arreglo |
+|---|---|
+| El subpack por defecto (`no cape & tool`, el último de la lista) **no existía** → `Invalid render controller: controller.render.swordd_n … cape` en el log. Los otros subpacks también dejaban controladores sin definir. | 4 subpacks reales; cada uno define los 21 render controllers (los apagados son “vacíos”), así nunca falta ninguno. |
+| La capa custom se dibujaba **encima** de la capa del skin (marketplace). | Se oculta si el skin trae capa (`query.has_cape`) y hay un subpack para apagarla del todo. |
+| Cuerpo del jugador con `Material.glow` (`entity_emissive_alpha`) y faltaban los materiales `animated` y `spectator` → skins del marketplace con píxeles semitransparentes/animados se veían mal y el modo espectador no tenía material. | Render controllers y materiales del jugador iguales a vanilla 1.26 (se mantiene sin destello rojo al recibir daño, como quería el autor). Falta de textura `cape` añadida. |
+| Capa de “sombrero” del skin siempre visible aunque llevaras casco. | `helmet_layer_visible = !query.has_head_gear` como vanilla. |
+| `unknown variable 'temp.i'` (`variable.shield` usaba `t.i` fuera de un bucle). | Revisa los 9 espacios de la barra rápida. |
+| `unknown variable 'variable.melee_spear_equipped'`. | Se define en `pre_animation`. |
+| Accesorios en la espalda: bucle de 27 sobre una barra de 9 y `slot.weapon.mainhand` con índice > 0 → **la espada que sostenías también aparecía en tu espalda**. | Condición simple: está en la barra rápida y no en la mano. Sin bucles (más ligero). |
+| Sobrescribía `controller.animation.humanoid.brandish_spear` con una versión que lee `variable.trident` → **ahogados, esqueletos, strays, bogged, vex, piglins** perdían la pose del tridente/lanza y llenaban el log de errores. | El del pack ahora es `controller.animation.fanim.brandish_spear`; los mobs usan el vanilla. Igual con `crossbow` y `root` (ids propios). |
+| El latido aparecía dos veces en `animate`, una sin condición, y la animación no tenía duración → **sonaba sin parar**. | Una sola vez, con `health <= 2`, y duración 0.9 s. |
+| Animaciones inexistentes: `armor_cape`, `time_25`, `p.dagger_pose`, `p.fly`, `fall_bs`, `ground_bs`, `hurt2`, `climb`; `halbert.attack3` apuntaba a `chalbert_attack3` (errata). | `time_25` creada (temporizador del combo de lanza), errata corregida, el resto quitado (no venían en el pack; `armor_cape` ya la anima `animation.player.cape`). |
+| Controladores `attack.dagger` / `attack.halbert2`: transición a un estado `3` que no existe. | Quitada (era inalcanzable). |
+| Partícula `fiery:blood` inexistente; textura `herobrine_sword` inexistente. | Referencias quitadas (nadie las usaba). |
+| `first_person_attack` / `first_person_map` eran copias de vanilla. | Eliminadas: se usa vanilla. Primera persona del root actualizada a 1.26 (lanza, escudo). |
+| Faltaba `riding.root` (altura correcta en bote/vagoneta) y `holding_heavy_core`. | Añadidos. |
+| Archivos que el juego no lee: `back_sword.json` en la raíz, `.mcattributes`, `heartbeat.MP3` (formato no soportado), `sword_stabswadwda.ogg`. | Eliminados. |
+
+Notas: las texturas de vainas/espadas de *Fiery Combat* (`nichirin_sheath`, etc.) vienen
+en ese addon; sin él esos objetos no existen y no se dibujan. La animación de proyectiles
+girando (`animation.actor.billboard`) es del autor y se dejó tal cual.
+
+---
+
+## Player Action Optimization (KID_SKY) – actualizado (descartado)
 
 Pack de recursos de animaciones de jugador para **Minecraft Bedrock**, actualizado de la
 versión 0.4.1 (era 1.16/1.17) a la **0.5.0** para Bedrock **1.26.x** (probado contra los

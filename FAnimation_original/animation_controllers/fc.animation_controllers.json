@@ -1,0 +1,365 @@
+{
+	"format_version" : "1.10.0",
+	"animation_controllers" : {
+		"controller.animation.player.holding_katana" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "q.is_sprinting && !q.is_sneaking && query.all_animations_finished && v.holding_katana && !variable.attack && query.modified_move_speed>0.1"
+						},
+						{
+							"2" : "!q.is_sprinting && !q.is_sneaking && query.all_animations_finished && v.holding_katana && !variable.attack && query.modified_move_speed>0.1"
+						}
+					]
+				},
+				"1" : {
+					"animations" : [ {"holding_katana1":"!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_in_water"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "(!q.is_sprinting || q.is_sneaking || !q.all_animations_finished || !v.holding_katana || query.modified_move_speed<0.1 || variable.attack)"
+						},
+						{
+							"2" : "!q.is_sprinting && !q.is_sneaking && query.all_animations_finished && v.holding_katana && !variable.attack && query.modified_move_speed>0.1"
+						}
+					]
+				},
+				"2" : {
+					"animations" : [ {"holding_katana":"!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_in_water"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"1" : "q.is_sprinting && !q.is_sneaking && query.all_animations_finished && v.holding_katana && !variable.attack && query.modified_move_speed>0.1"
+						},
+						{
+							"default" : "(q.is_sprinting || q.is_sneaking || !q.all_animations_finished || !v.holding_katana || query.modified_move_speed<0.1 || variable.attack)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.holding_greatsword" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"2" : " !q.is_sneaking && query.all_animations_finished && v.holding_greatsword && !variable.attack && query.modified_move_speed>0.1"
+						}
+					]
+				},
+				"2" : {
+					"animations" : [ {"holding_greatsword":"!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_in_water"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "(q.is_sneaking || !q.all_animations_finished || !v.holding_greatsword || query.modified_move_speed<0.1 || variable.attack)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.broadsword_blocking" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"1" : "v.broadsword_blocking && q.is_sneaking"
+						}
+					]
+				},
+				"1" : {
+					"animations" : [ "broadsword_blocking" ],
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"default" : "!v.broadsword_blocking || !q.is_sneaking"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.katana_blocking" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"1" : "v.katana_blocking && q.is_sneaking"
+						}
+					]
+				},
+				"1" : {
+					"animations" : [ "katana_blocking" ],
+					"blend_transition": 0.1,
+					"transitions" : [
+						{
+							"default" : "!v.katana_blocking || !q.is_sneaking"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.holding_broadsword" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"2" : "query.all_animations_finished && v.holding_broadsword && !variable.attack && query.modified_move_speed>0.1"
+						}
+					]
+				},
+				"2" : {
+					"animations" : [ {"holding_broadsword":"!v.is_first_person && !q.is_sneaking && !query.is_riding && !q.is_gliding && !q.is_in_water"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "(!q.all_animations_finished || !v.holding_broadsword || query.modified_move_speed<0.1 || variable.attack)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.holding_spear" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"2" : "query.all_animations_finished && v.holding_spear && !variable.attack && query.modified_move_speed>0.1"
+						}
+					]
+				},
+				"2" : {
+					"animations" : [ {"holding_spear":"!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_in_water"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "(!v.holding_spear || query.modified_move_speed<0.1 || variable.attack)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.holding_dagger" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"2" : "query.all_animations_finished && v.holding_dual_dagger && !variable.attack && query.modified_move_speed>0.3 && q.is_sprinting"
+						}
+					]
+				},
+				"2" : {
+					"animations" : [ {"holding_dagger":"!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_in_water"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "(!v.holding_dual_dagger || query.modified_move_speed<0.3 || !q.is_sprinting || variable.attack)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.holding_void_breaker" : {
+			"initial_state" : "default",
+			"states" : {
+				"default" : {
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"2" : " query.all_animations_finished && v.holding_halbert2 && !variable.attack && query.modified_move_speed>0.1"
+						}
+					]
+				},
+				"2" : {
+					"animations" : [ {"holding_void_breaker":"!v.is_first_person && !query.is_riding && !q.is_gliding && !q.is_in_water"} ],
+					"blend_transition": 0.2,
+					"transitions" : [
+						{
+							"default" : "(!v.holding_halbert2 || query.modified_move_speed<0.1 || variable.attack)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.greatsword_pose": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.attack && v.greatsword_pose && query.modified_move_speed<0.1"
+						}
+					]
+				},
+				"1": {
+					"animations": [ "greatsword_pose" ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "(!v.greatsword_pose || variable.attack || query.modified_move_speed>0.1)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.katana_pose": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !q.is_sneaking  && !variable.attack && v.holding_katana && query.modified_move_speed<0.1"
+						}
+					]
+				},
+				"1": {
+					"animations": [ "katana_pose" ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "(q.is_sneaking || !v.holding_katana || variable.attack || query.modified_move_speed>0.1)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.broadsword_pose": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.attack && v.broadsword_pose && query.modified_move_speed<0.1"
+						}
+					]
+				},
+				"1": {
+					"animations": [ "broadsword_pose" ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "(!v.broadsword_pose || variable.attack || query.modified_move_speed>0.1)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.spear_pose": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.attack && v.spear_pose && query.modified_move_speed<0.1"
+						}
+					]
+				},
+				"1": {
+					"animations": [ "spear_pose" ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "(!v.spear_pose || variable.attack || query.modified_move_speed>0.1)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.halbert_pose": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.attack && v.halbert_pose && query.modified_move_speed<0.1"
+						}
+					]
+				},
+				"1": {
+					"animations": [ "halbert_pose" ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "(!v.halbert_pose || variable.attack || query.modified_move_speed>0.1)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.void_breaker_pose": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.attack && v.holding_halbert2 && query.modified_move_speed<0.1"
+						}
+					]
+				},
+				"1": {
+					"animations": [ "void_breaker_pose" ],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "(!v.holding_halbert2 || variable.attack || query.modified_move_speed>0.1)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.player.fall_bs": {
+			"states": {
+				"default": {
+					"blend_transition": 0.4,
+					"transitions": [
+						{
+							"1" : "!q.is_first_person && !query.is_on_ground && query.ground_speed>13 && !query.is_sprinting && !query.is_in_water && !query.is_gliding"
+						},
+						{
+						    "2" : "!q.is_first_person && !query.is_on_ground && query.ground_speed>13 && !query.is_sprinting && !query.is_in_water && query.is_gliding"
+						}
+					]
+				},
+				"1": {
+					"animations": [
+						{"fall_bs":"!v.is_first_person && v.holding_broadsword"}
+					],
+					"blend_transition": 0.4,
+					"transitions": [
+						{
+							"2": "!q.is_first_person && query.is_on_ground && query.ground_speed<13 && !query.is_in_water"
+						},
+						{
+							"default": "!q.is_first_person && (!query.is_on_ground && query.ground_speed<13) || query.is_in_water"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						{"ground_bs":"!v.is_first_person && !q.is_gliding && v.holding_broadsword"}
+					],
+					"blend_transition": 1.4,
+					"transitions": [
+						{
+							"default": "!q.is_first_person && query.is_on_ground || query.ground_speed || query.is_sprinting && !query.is_in_water"
+						}
+					]
+				}
+			}
+		}
+	}
+}

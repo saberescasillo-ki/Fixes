@@ -1,0 +1,46 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.cape": {
+      "arrays": {
+        "textures": {
+          "array.xcape": [
+            "Texture.cape0",
+            "Texture.cape1",
+            "Texture.cape2",
+            "Texture.cape3",
+            "Texture.cape4",
+            "Texture.cape5",
+            "Texture.cape6",
+            "Texture.cape7",
+            "Texture.cape8",
+            "Texture.cape9",
+            "Texture.cape10",
+            "Texture.cape11"
+          ]
+        }
+      },
+      "geometry": "geometry.cape",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "(query.get_name == 'Harvi4488' ? Texture.cc : (query.get_name == 'FieryAbyss17' ? Texture.cape2 : Texture.cape0))"
+      ],
+      "is_hurt_color": {
+        "r": "0.0",
+        "g": "0.0",
+        "b": "0.0",
+        "a": "0.0"
+      },
+      "on_fire_color": {
+        "r": "0.0",
+        "g": "0.0",
+        "b": "0.0",
+        "a": "0.0"
+      }
+    }
+  }
+}

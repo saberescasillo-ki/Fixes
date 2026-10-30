@@ -1,0 +1,48 @@
+{
+	"format_version" : "1.10.0",
+	"animation_controllers" : {
+		"controller.animation.player.consume": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"eat" : "query.item_remaining_use_duration > 0.0 && (query.get_equipped_item_name != 'spyglass' && query.get_equipped_item_name != 'crossbow' && query.get_equipped_item_name != 'bow' && query.get_equipped_item_name != 'trident' && query.get_equipped_item_name != 'ender_trident' && query.get_equipped_item_name != 'fishing_rod' && !v.drink) && query.is_alive"
+						},
+						{
+						    "drink" : "query.item_remaining_use_duration > 0.0 && (v.drink) && query.is_alive"
+						}
+					]
+				},
+				"eat": {
+					"animations": [
+						{"eat":"query.get_equipped_item_name != 'brush' && query.get_equipped_item_name != 'goat_horn'"}
+					],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "query.item_remaining_use_duration <= 0.0 || (query.get_equipped_item_name == 'spyglass' || query.get_equipped_item_name == 'crossbow' || query.get_equipped_item_name == 'bow' || query.get_equipped_item_name == 'trident' || query.get_equipped_item_name == 'ender_trident' || query.get_equipped_item_name == 'fishing_rod' || v.drink) || !query.is_alive"
+						},
+						{
+						    "drink" : "query.item_remaining_use_duration > 0.0 && (v.drink) && query.is_alive"
+						}
+					]
+				},
+				"drink": {
+					"animations": [
+						"drink"
+					],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"default": "query.item_remaining_use_duration <= 0.0 || (!v.drink) || !query.is_alive"
+						},
+						{
+							"eat" : "query.item_remaining_use_duration > 0.0 && (query.get_equipped_item_name != 'spyglass' && query.get_equipped_item_name != 'crossbow' && query.get_equipped_item_name != 'bow' && query.get_equipped_item_name != 'trident' && query.get_equipped_item_name != 'ender_trident' && query.get_equipped_item_name != 'fishing_rod' && !v.drink) && query.is_alive"
+						}
+					]
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.actor.billboard": {
+			"loop": true,
+			"animation_length": 0.75,
+			"bones": {
+				"body": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.75": [360, 0, 360]
+					},
+					"scale": 0.7
+				}
+			}
+		}
+	}
+}

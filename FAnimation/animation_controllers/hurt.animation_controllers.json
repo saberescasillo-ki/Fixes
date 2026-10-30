@@ -1,0 +1,26 @@
+{
+	"format_version" : "1.10.0",
+	"animation_controllers" : {
+			"controller.animation.player.damage": {
+				"states": {
+					"default": {
+						"blend_transition": 0.2,
+						"transitions": [
+							{
+								"1" : "query.hurt_time"
+							}
+						]
+					},
+					"1": {
+						"animations": [ "hurt" ],
+						"blend_transition": 0.2,
+						"transitions": [
+							{
+								"default": "!query.hurt_time"
+							}
+						]
+					}
+				}
+		}
+	}
+}

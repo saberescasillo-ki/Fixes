@@ -1,0 +1,117 @@
+ {
+   "format_version" : "1.14.0",
+   "sound_definitions" : {
+	"sword.slash1" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/fiery/sword_slash1", "sounds/fiery/sword_slash2" ]
+      },
+	  "sword.slash2" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/fiery/sword_slash2" ]
+      },
+	  "sword.stab" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/fiery/sword_stab" ]
+      },
+	  "trident.slash1" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/fiery/trident_slash1", "sounds/fiery/trident_slash2" ]
+      },
+	  "trident.slash2" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/fiery/trident_slash2" ]
+      },
+	  "trident.stab" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/fiery/trident_stab" ]
+      },
+	  "heartbeat" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/fiery/heartbeat" ]
+      },
+	  "sword_in" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/weapon/sword_in" ]
+      },
+	  "whoosh" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/weapon/whoosh" ]
+      },
+      "whoosh_katana" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [
+         {
+            "name": "sounds/weapon/whoosh",
+            "pitch" : 1.50,
+            "volume" : 1.0
+         }
+       ]
+      },
+	  "whoosh_hard" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+         "category" : "player",
+         "sounds" : [ "sounds/weapon/whoosh_hard" ]
+      },
+      "whoosh_rod" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+          "category" : "player",
+          "sounds" : [ "sounds/weapon/whoosh_rod" ]
+       },
+       "whoosh_sharp" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+           "category" : "player",
+           "sounds" : [ "sounds/weapon/whoosh_sharp" ]
+        },
+        "whoosh_small" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+            "category" : "player",
+            "sounds" : [ "sounds/weapon/whoosh_small" ]
+         },
+        "wield_weapon" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+            "category" : "player",
+            "sounds" : [ {
+               "name": "sounds/weapon/wield_weapon",
+               "pitch" : 0.40,
+               "volume" : 1.0 
+               } 
+            ]
+         },
+        "unsheat_katana" : {
+         "max_distance" : 16.0,
+         "min_distance" : null,
+            "category" : "player",
+            "sounds" : [ {
+            "name": "sounds/fiery/unsheat_katana",
+            "pitch" : 1.50,
+            "volume" : 0.80 
+            }
+         ]
+      }
+   }
+ }

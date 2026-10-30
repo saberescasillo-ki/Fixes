@@ -1,0 +1,10 @@
+{
+  "format_version": "1.10",
+  "render_controllers": {
+    "controller.render.item_default": {
+      "geometry": "!(query.is_invisible && query.is_first_person)? geometry.default : ''",
+      "materials": [ { "*": "variable.is_enchanted ? material.enchanted : material.default" } ],
+      "textures": [ "texture.default", "texture.enchanted" ]
+    }
+  }
+}

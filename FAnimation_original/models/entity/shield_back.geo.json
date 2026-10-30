@@ -1,0 +1,47 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.shield_back",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "root",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "waist",
+					"parent": "root",
+					"pivot": [0, 12, 0]
+				},
+				{
+					"name": "body",
+					"parent": "waist",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "shield_back",
+					"parent": "body",
+					"pivot": [-1, 18, 1.5],
+					"rotation": [0, 0, -22.5]
+				},
+				{
+					"name": "1",
+					"parent": "shield_back",
+					"pivot": [4, -10, 7],
+					"rotation": [180, 0, 175],
+					"cubes": [
+						{"origin": [0, 7, 8], "size": [12, 22, 1], "uv": [0, 0]},
+						{"origin": [5, 15, 9], "size": [2, 6, 6], "uv": [26, 0]}
+					]
+				}
+			]
+		}
+	]
+}

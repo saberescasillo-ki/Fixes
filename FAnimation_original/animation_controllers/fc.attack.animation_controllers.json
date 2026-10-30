@@ -1,0 +1,503 @@
+{
+	"format_version" : "1.10.0",
+	"animation_controllers" : {
+		"controller.animation.attack.katana": {
+			"states": {
+				"default": {
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_katana && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_katana && v.attack_time"
+						},
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_katana && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"katana.attack1"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_katana && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_katana || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"katana.attack2"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_katana && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_katana || !v.attack_time)"
+						}
+					]
+				},
+				"3": {
+					"animations": [
+						"katana.attack3"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_katana && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_katana || !v.attack_time)"
+						}
+					]
+				}
+			}
+		},		
+		"controller.animation.attack.dagger": {
+			"states": {
+				"default": {
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dagger && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dagger && v.attack_time"
+						},
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dagger && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"dual_dagger.attack3"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dagger && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_dagger || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"dual_dagger.attack4"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dagger && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_dagger || !v.attack_time)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.attack.halbert2": {
+			"states": {
+				"default": {
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert2 && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert2 && v.attack_time"
+						},
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert2 && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"broadsword.attack1"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert2 && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_halbert2 || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"broadsword.attack2"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert2 && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_halbert2 || !v.attack_time)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.attack.halbert": {
+			"states": {
+				"default": {
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert && v.attack_time"
+						},
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"halbert.attack1"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_halbert || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"halbert.attack2"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_halbert || !v.attack_time)"
+						}
+					]
+				},
+				"3": {
+					"animations": [
+						"halbert.attack3"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_halbert && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_halbert || !v.attack_time)"
+						}
+					]
+				}
+			}
+		},		
+		"controller.animation.attack.dual_dagger": {
+			"states": {
+				"default": {
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dual_dagger && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dual_dagger && v.attack_time"
+						},
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dual_dagger && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"dual_dagger.attack1"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dual_dagger && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_dual_dagger || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"dual_dagger.attack2"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dual_dagger && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_dual_dagger || !v.attack_time)"
+						}
+					]
+				},
+				"3": {
+					"animations": [
+						"dual_dagger.attack3"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_dual_dagger && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_dual_dagger || !v.attack_time)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.attack.broadsword": {
+			"states": {
+				"default": {
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_broadsword && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_broadsword && v.attack_time"
+						},
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_broadsword && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"broadsword.attack1"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_broadsword && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_broadsword || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"broadsword.attack2"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_broadsword && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_broadsword || !v.attack_time)"
+						}
+					]
+				},
+				"3": {
+					"animations": [
+						"broadsword.attack3"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_broadsword && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_broadsword || !v.attack_time)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.attack.greatsword": {
+			"states": {
+				"default": {
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_greatsword && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_greatsword && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"greatsword.attack3"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_greatsword && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_greatsword || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"greatsword.attack2"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_greatsword && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_greatsword || !v.attack_time)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.attack.claymore": {
+			"states": {
+				"default": {
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_claymore && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_claymore && v.attack_time"
+						},
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_claymore && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"claymore.attack1"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_claymore && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_claymore || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"claymore.attack2"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_claymore && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_claymore || !v.attack_time)"
+						}
+					]
+				},
+				"3": {
+					"animations": [
+						"claymore.attack3"
+					],
+					"blend_transition": 0.15,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_claymore && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_claymore || !v.attack_time)"
+						}
+					]
+				}
+			}
+		},
+		"controller.animation.attack.spear": {
+			"states": {
+				"default": {
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_spear && v.attack_time"
+						},
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_spear && v.attack_time"
+						},
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_spear && v.attack_time"
+						}
+					]
+				},
+				"1": {
+					"animations": [ 
+						"spear.attack1",
+						"time_25"
+					],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"2" : "query.all_animations_finished && !variable.is_first_person && variable.holding_spear && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_spear || !v.attack_time)"
+						}
+					]
+				},
+				"2": {
+					"animations": [
+						"spear.attack2",
+						"time_25"
+					],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"3" : "query.all_animations_finished && !variable.is_first_person && variable.holding_spear && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_spear || !v.attack_time)"
+						}
+					]
+				},
+				"3": {
+					"animations": [
+						"spear.attack3",
+						"time_25"
+					],
+					"blend_transition": 0.2,
+					"transitions": [
+						{
+							"1" : "query.all_animations_finished && !variable.is_first_person && variable.holding_spear && v.attack_time"
+						},
+						{
+							"default" : "query.all_animations_finished && (variable.is_first_person || !variable.holding_spear || !v.attack_time)"
+						}
+					]
+				}
+			}
+		}
+	}
+}

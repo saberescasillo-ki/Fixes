@@ -1,0 +1,57 @@
+{
+  "format_version": 2,
+  "header": {
+    "description": "§rPut this pack at the top! \nby §cfieryabyss§r \nX §dFiery Combat§r §aV2.0",
+    "name": "§l§bFAnimation §r|§l §6Update 7 §r§a(fix)",
+    "uuid": "95f82a6e-6ce9-42a7-bda6-23500e7f4b71",
+    "version": [
+      0,
+      1,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      26,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "description": "§r§6f",
+      "type": "resources",
+      "uuid": "2cbe2886-9a2f-447e-a28d-04bc812a7efc",
+      "version": [
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "subpacks": [
+    {
+      "folder_name": "cape_off_back_off",
+      "name": "§cSin capa custom ni accesorios",
+      "memory_tier": 1
+    },
+    {
+      "folder_name": "back_off",
+      "name": "§6Sin accesorios en la espalda",
+      "memory_tier": 1
+    },
+    {
+      "folder_name": "cape_off",
+      "name": "§bCapa de tu skin / Marketplace",
+      "memory_tier": 1
+    },
+    {
+      "folder_name": "default",
+      "name": "§l§aDefault",
+      "memory_tier": 1
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "fieryabyss"
+    ]
+  }
+}

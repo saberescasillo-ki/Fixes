@@ -1,0 +1,325 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.shield_back": {
+      "geometry": "geometry.shield_back",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.swordd_d": {
+      "geometry": "geometry.swordd",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.swordd_g": {
+      "geometry": "geometry.swordd",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.swordd_i": {
+      "geometry": "geometry.swordd",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.swordd_n": {
+      "geometry": "geometry.swordd",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.swordd_s": {
+      "geometry": "geometry.swordd",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.swordd_w": {
+      "geometry": "geometry.swordd",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.tools_d": {
+      "geometry": "geometry.tools",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.tools_g": {
+      "geometry": "geometry.tools",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.tools_i": {
+      "geometry": "geometry.tools",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.tools_n": {
+      "geometry": "geometry.tools",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.tools_s": {
+      "geometry": "geometry.tools",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.tools_w": {
+      "geometry": "geometry.tools",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.toolsx_d": {
+      "geometry": "geometry.toolsx",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.toolsx_g": {
+      "geometry": "geometry.toolsx",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.toolsx_i": {
+      "geometry": "geometry.toolsx",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.toolsx_n": {
+      "geometry": "geometry.toolsx",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.toolsx_s": {
+      "geometry": "geometry.toolsx",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.toolsx_w": {
+      "geometry": "geometry.toolsx",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    },
+    "controller.render.trident_back": {
+      "geometry": "geometry.trident_back",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.empty"
+      ],
+      "part_visibility": [
+        {
+          "*": false
+        }
+      ]
+    }
+  }
+}

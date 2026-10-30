@@ -1,0 +1,189 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.player.run.arms": {
+			"loop": true,
+			"bones": {
+				"leftArm": {
+					"rotation": [
+						"v.holding_katana || v.holding_halbert2 || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : math.sin(query.anim_time * 616) * 10 * 5",
+						"v.holding_katana || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : 6-math.sin(query.anim_time * 616) * 5 * 2.5",
+						-5
+					],
+					"position": [
+						0,
+						0,
+						"v.holding_katana || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : math.sin(query.anim_time * 616) * 1.5 * 1"
+					]
+				},
+				"rightArm": {
+					"rotation": [
+						"v.holding_katana || v.holding_greatsword || v.holding_spear || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -math.sin(query.anim_time * 616) * 10 * 5",
+						"v.holding_katana || v.holding_greatsword || v.holding_spear || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -6-math.sin(query.anim_time * 616) * 5 * 2.5",
+						5
+					],
+					"position": [
+						0,
+						0,
+						"v.holding_katana || v.holding_greatsword || v.holding_spear || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -math.sin(query.anim_time * 616) * 1.5 * 1"
+					]
+				}
+			}
+		},
+		"animation.player.run.legs": {
+			"loop": true,
+			"bones": {
+				"leftLeg": {
+					"rotation": ["0-math.sin(query.anim_time * 616) * 10 * 5", 0, 0],
+					"position": [0.2, "1+math.cos(query.anim_time * 616) * 2", "-1-math.sin(query.anim_time * 616) * 1.5 * 1"]
+				},
+				"rightLeg": {
+					"rotation": ["0+math.sin(query.anim_time * 616) * 10 * 5", 0, 0],
+					"position": [-0.2, "1-math.cos(query.anim_time * 616) * 2", "-1+math.sin(query.anim_time * 616) * 1.5 * 1"]
+				},
+				"waist": {
+					"rotation": ["5+math.sin(query.anim_time * 1232) * 1 * 1.5", "0-math.sin(query.anim_time * 616) * 2.5 * 2.5", 0],
+					"position": [0, "0.5+math.sin(query.anim_time * 1232) * 1 * 0.5", 0]
+				},
+				"root": {
+					"rotation": [10, 0, 0],
+					"position": [0, 0, 0]
+				}
+			}
+		},
+		"animation.player.walk.arms": {
+			"loop": true,
+			"bones": {
+				"leftArm": {
+					"rotation": [
+						"v.holding_katana || v.holding_halbert2 || v.holding_broadsword || v.using_items || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : math.sin(query.anim_time * 470) * 5 * 5",
+						"v.holding_katana || v.holding_halbert2 || v.holding_broadsword || v.using_items || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : 6-math.sin(query.anim_time * 470) * 2.5 * 2.5",
+						0
+					],
+					"position": [
+						0,
+						0,
+						"v.holding_katana || v.holding_halbert2 || v.holding_broadsword || v.using_items || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : math.sin(query.anim_time * 470) * 1 * 1"
+					]
+				},
+				"rightArm": {
+					"rotation": [
+						"v.holding_katana || v.holding_greatsword || v.holding_spear || v.holding_halbert2 || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -math.sin(query.anim_time * 470) * 5 * 5",
+						"v.holding_katana || v.holding_greatsword || v.holding_spear || v.holding_halbert2 || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -6-math.sin(query.anim_time * 470) * 2.5 * 2.5",
+						0
+					],
+					"position": [
+						0,
+						0,
+						"v.holding_katana || v.holding_greatsword || v.holding_spear || v.holding_halbert2 || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -math.sin(query.anim_time * 470) * 1 * 1"
+					]
+				}
+			}
+		},
+		"animation.player.walk.legs": {
+			"loop": true,
+			"bones": {
+				"leftLeg": {
+					"rotation": ["0-math.sin(query.anim_time * 470) * 5 * 5", 0, 0],
+					"position": [0.2, "1+math.cos(query.anim_time * 470) * 1", "-0.5-math.sin(query.anim_time * 470) * 1 * 1"]
+				},
+				"rightLeg": {
+					"rotation": ["0+math.sin(query.anim_time * 470) * 5 * 5", 0, 0],
+					"position": [-0.2, "1-math.cos(query.anim_time * 470) * 1", "-0.5+math.sin(query.anim_time * 470) * 1 * 1"]
+				},
+				"waist": {
+					"rotation": ["5+math.sin(query.anim_time * 940) * 1 * 1.5", "0-math.sin(query.anim_time * 470) * 2.5 * 2.5", 0],
+					"position": [0, "math.sin(query.anim_time * 940) * 0.5 * 0.5", 0]
+				}
+			}
+		},
+		"animation.player.sneak.arms": {
+			"loop": true,
+			"bones": {
+				"leftArm": {
+					"rotation": [
+						"(q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') ? 0 : math.sin(query.anim_time * 200) * 5 * 5",
+						"6-math.sin(query.anim_time * 200) * 2.5 * 2.5",
+						0
+					],
+					"position": [0, 0, "math.sin(query.anim_time * 200) * 1 * 1"]
+				},
+				"rightArm": {
+					"rotation": [
+						"(q.is_sneaking && query.get_equipped_item_name == 'shield') ? 0 : -math.sin(query.anim_time * 200) * 5 * 5",
+						"-6-math.sin(query.anim_time * 200) * 2.5 * 2.5",
+						0
+					],
+					"position": [0, 0, "-math.sin(query.anim_time * 200) * 1 * 1"]
+				}
+			}
+		},
+		"animation.player.sneak.legs": {
+			"loop": true,
+			"bones": {
+				"leftLeg": {
+					"rotation": ["0-math.sin(query.anim_time * 200) * 5 * 5", 0, 0],
+					"position": [0.2, "1+math.cos(query.anim_time * 200) * 1", "-0.5-math.sin(query.anim_time * 200) * 1 * 1"]
+				},
+				"rightLeg": {
+					"rotation": ["0+math.sin(query.anim_time * 200) * 5 * 5", 0, 0],
+					"position": [-0.2, "1-math.cos(query.anim_time * 200) * 1", "-0.5+math.sin(query.anim_time * 200) * 1 * 1"]
+				},
+				"waist": {
+					"rotation": ["2.5+math.sin(query.anim_time * 400) * 1 * 1.5", "0-math.sin(query.anim_time * 200) * 2.5 * 2.5", 0],
+					"position": [0, "math.sin(query.anim_time * 400) * 0.5 * 0.5", 0]
+				}
+			}
+		},
+		"animation.player.run2.arms": {
+			"loop": true,
+			"bones": {
+				"leftArm": {
+					"rotation": [
+						"v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : -15+math.sin(query.anim_time * 420) * 7.5 * 7.5",
+						"v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : 6-math.sin(query.anim_time * 420) * 3 * 3",
+						0
+					],
+					"position": [
+						0,
+						0,
+						"v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_left || (q.is_sneaking && query.get_equipped_item_name('off_hand') == 'shield') || ((v.holding_axe || v.trident) && q.is_sprinting) ? 0 : math.sin(query.anim_time * 420) * 1 * 1"
+					]
+				},
+				"rightArm": {
+					"rotation": [
+						"v.holding_spear || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -15-math.sin(query.anim_time * 420) * 7.5 * 7.5 ",
+						"v.holding_spear || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -6-math.sin(query.anim_time * 420) * 3 * 3",
+						0
+					],
+					"position": [
+						0,
+						0,
+						"v.holding_spear || v.holding_halbert2 || v.holding_dual_dagger || v.holding_broadsword || variable.map_holding_right || v.hc || (q.is_sneaking && query.get_equipped_item_name == 'shield') || ((v.holding_axe || v.trident || v.holding_sword) && q.is_sprinting) ? 0 : -math.sin(query.anim_time * 420) * 1 * 1"
+					]
+				}
+			}
+		},
+		"animation.player.run2.legs": {
+			"loop": true,
+			"bones": {
+				"root": {
+					"rotation": [7.5, 0, 0],
+					"position": [0, "1.5+math.sin(query.anim_time * 840) * 1.5 * 1.5", 0]
+				},
+				"waist": {
+					"rotation": ["10+math.sin(query.anim_time * 840) * 1.5 * 2", "v.holding_dual_dagger || v.trident ? 0 : 0-math.sin(query.anim_time * 420) * 3 * 3", 0],
+					"position": [0, "0+math.sin(query.anim_time * 840) * 1 * 1", 0]
+				},
+				"leftLeg": {
+					"rotation": ["10-math.sin(query.anim_time * 420) * 7.5 * 7.5", 0, 0],
+					"position": [0.2, "1+math.cos(query.anim_time * 420) * 1.5", "-0.5-math.sin(query.anim_time * 420) * 1.5 * 1.5"]
+				},
+				"rightLeg": {
+					"rotation": ["10+math.sin(query.anim_time * 420) * 7.5 * 7.5", 0, 0],
+					"position": [-0.2, "1-math.cos(query.anim_time * 420) * 1.5", "-0.5+math.sin(query.anim_time * 420) * 1.5 * 1.5"]
+				}
+			}
+		}
+	}
+}

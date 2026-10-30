@@ -1,0 +1,40 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "§rPut this pack at the top! \nby §cfieryabyss§r \nX §dFiery Combat§r §aV2.0",
+        "name": "§l§bFAnimation §r|§l §6Update 7",
+        "uuid": "95f82a6e-6ce9-42a7-bda6-23500e7f4b71",
+        "version": [0, 0, 2],
+        "min_engine_version": [ 1, 20, 0 ]
+    },
+    "modules": [
+        {
+            "description": "§r§6f",
+            "type": "resources",
+            "uuid": "2cbe2886-9a2f-447e-a28d-04bc812a7efc",
+            "version": [0, 0, 2]
+      }
+   ],
+   "subpacks": [
+   {
+      "folder_name": "no tool",
+      "name": "§6No Tool Accessories",
+      "memory_tier": 1
+    }, 
+	{
+      "folder_name": "no cape",
+      "name": "§6No Cape",
+      "memory_tier": 1
+    },
+	{
+      "folder_name": "default",
+      "name": "§lDefault",
+      "memory_tier": 1
+     },
+	 {
+      "folder_name": "no cape & tool",
+      "name": "§4No Cape & Tool Accessories",
+      "memory_tier": 1
+     }
+   ]
+}
