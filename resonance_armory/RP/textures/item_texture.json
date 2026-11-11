@@ -25,6 +25,15 @@
     },
     "resonance_lunar_crescent": {
       "textures": "textures/items/lunar_crescent"
+    },
+    "resonance_amethyst_glaive": {
+      "textures": "textures/items/amethyst_glaive"
+    },
+    "resonance_blaze_scimitar": {
+      "textures": "textures/items/blaze_scimitar"
+    },
+    "resonance_echo_maul": {
+      "textures": "textures/items/echo_maul"
     }
   }
 }

@@ -337,10 +337,10 @@
               "sleeping": "query.is_sleeping && query.is_alive"
             },
             {
-              "attack.positions": "variable.attack_time >= 0.0 && !variable.melee_spear_equipped && !query.is_item_name_any('slot.weapon.mainhand', 0, 'resonance:smoke_club', 'resonance:iron_halberd', 'resonance:golden_rapier', 'resonance:copper_hammer', 'resonance:diamond_greatsword', 'resonance:netherite_relic_blade', 'resonance:redstone_pulse_gauntlet', 'resonance:lunar_crescent')"
+              "attack.positions": "variable.attack_time >= 0.0 && !variable.melee_spear_equipped && !query.is_item_name_any('slot.weapon.mainhand', 0, 'resonance:smoke_club', 'resonance:iron_halberd', 'resonance:golden_rapier', 'resonance:copper_hammer', 'resonance:diamond_greatsword', 'resonance:netherite_relic_blade', 'resonance:redstone_pulse_gauntlet', 'resonance:lunar_crescent', 'resonance:amethyst_glaive', 'resonance:blaze_scimitar', 'resonance:echo_maul')"
             },
             {
-              "attack.rotations": "variable.attack_time >= 0.0 && !variable.melee_spear_equipped && !query.is_item_name_any('slot.weapon.mainhand', 0, 'resonance:smoke_club', 'resonance:iron_halberd', 'resonance:golden_rapier', 'resonance:copper_hammer', 'resonance:diamond_greatsword', 'resonance:netherite_relic_blade', 'resonance:redstone_pulse_gauntlet', 'resonance:lunar_crescent')"
+              "attack.rotations": "variable.attack_time >= 0.0 && !variable.melee_spear_equipped && !query.is_item_name_any('slot.weapon.mainhand', 0, 'resonance:smoke_club', 'resonance:iron_halberd', 'resonance:golden_rapier', 'resonance:copper_hammer', 'resonance:diamond_greatsword', 'resonance:netherite_relic_blade', 'resonance:redstone_pulse_gauntlet', 'resonance:lunar_crescent', 'resonance:amethyst_glaive', 'resonance:blaze_scimitar', 'resonance:echo_maul')"
             },
             {
               "shield_block_main_hand": "query.blocking && query.get_equipped_item_name('off_hand') != 'shield' && query.get_equipped_item_name == 'shield'"
