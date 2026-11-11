@@ -238,6 +238,7 @@ function getTargetsInCone(player, range, coneDeg, maxTargets) {
 import { system as system3 } from "@minecraft/server";
 var ATTACKING_FLAG = "attacking";
 var ATTACK_BLEND_OUT_SECONDS = 0.3;
+var MOVEMENT_LOCK_AFTER_HIT_TICKS = 3;
 function resetAttackingFlagIfNeeded(player, state) {
   if (state.attackingFlagUntil > 0 && system3.currentTick >= state.attackingFlagUntil) {
     player.setDynamicProperty(ATTACKING_FLAG, 0);
@@ -255,7 +256,12 @@ function startAttack(player, state, cfg, setState9) {
   state.lockUntilTick = tick + anim.nextAttackWindow;
   player.setDynamicProperty(ATTACKING_FLAG, 1);
   state.attackingFlagUntil = tick + cfg.attackLockTicks;
-  lockInputAndSuppressVanilla(player, anim.attackTime + cfg.inputCooldownTicks + 2, state);
+  // Solo se bloquea el movimiento durante el tramo del golpe (hasta justo
+  // despues del ultimo hit frame), no durante toda la animacion: asi el
+  // ataque no "congela" al jugador tanto tiempo.
+  const lastHit = anim.hitFrames.length ? anim.hitFrames[anim.hitFrames.length - 1] : anim.attackTime;
+  const lockTicks = anim.movementLockTicks ?? Math.min(anim.attackTime, lastHit + MOVEMENT_LOCK_AFTER_HIT_TICKS);
+  lockInputAndSuppressVanilla(player, lockTicks, state);
   player.playAnimation(anim.animation, { controller: cfg.animController, blendOutTime: cfg.blendOutSeconds ?? ATTACK_BLEND_OUT_SECONDS });
   setState9(player, state);
 }
@@ -309,36 +315,36 @@ var SMOKE_EFFECTS = [
 var ANIMS = [
   {
     animation: "animation.smoke_club.attack",
-    attackTime: 33,
-    nextAttackWindow: 6,
-    cancelIntoNextTick: 14,
-    hitFrames: [12, 13],
+    attackTime: 25,
+    nextAttackWindow: 5,
+    cancelIntoNextTick: 11,
+    hitFrames: [9, 10],
     range: 2.8,
     coneDeg: 75,
     damageMultiplier: 1,
-    specialFrame: 12
+    specialFrame: 9
   },
   {
     animation: "animation.smoke_club.attack1",
-    attackTime: 33,
-    nextAttackWindow: 6,
-    cancelIntoNextTick: 14,
-    hitFrames: [12, 13],
+    attackTime: 25,
+    nextAttackWindow: 5,
+    cancelIntoNextTick: 11,
+    hitFrames: [9, 10],
     range: 3.2,
     coneDeg: 80,
     damageMultiplier: 1.15,
-    specialFrame: 12
+    specialFrame: 9
   },
   {
     animation: "animation.smoke_club.attack2",
-    attackTime: 33,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 14,
-    hitFrames: [12, 13],
+    attackTime: 25,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 11,
+    hitFrames: [9, 10],
     range: 3,
     coneDeg: 85,
     damageMultiplier: 1.35,
-    specialFrame: 12
+    specialFrame: 9
   }
 ];
 var COMBO_CFG = {
@@ -449,30 +455,30 @@ var KNOCKBACK_VERTICAL = 0.35;
 var ANIMS2 = [
   {
     animation: "animation.iron_halberd.attack",
-    attackTime: 31,
-    nextAttackWindow: 6,
-    cancelIntoNextTick: 20,
-    hitFrames: [7, 8],
+    attackTime: 25,
+    nextAttackWindow: 5,
+    cancelIntoNextTick: 16,
+    hitFrames: [5, 6],
     range: 3.7,
     coneDeg: 75,
     damageMultiplier: 1
   },
   {
     animation: "animation.iron_halberd.attack1",
-    attackTime: 30,
-    nextAttackWindow: 6,
-    cancelIntoNextTick: 20,
-    hitFrames: [6],
+    attackTime: 24,
+    nextAttackWindow: 5,
+    cancelIntoNextTick: 16,
+    hitFrames: [5],
     range: 3.3,
     coneDeg: 80,
     damageMultiplier: 1.15
   },
   {
     animation: "animation.iron_halberd.attack2",
-    attackTime: 31,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 20,
-    hitFrames: [6, 7],
+    attackTime: 25,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 16,
+    hitFrames: [5, 6],
     range: 3.5,
     coneDeg: 85,
     damageMultiplier: 1.35
@@ -767,30 +773,30 @@ var SHOCK_RADIUS_WET = 4;
 var ANIMS4 = [
   {
     animation: "animation.copper_hammer.attack",
-    attackTime: 38,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 18,
-    hitFrames: [17],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 14,
+    hitFrames: [13],
     range: 3,
     coneDeg: 75,
     damageMultiplier: 1
   },
   {
     animation: "animation.copper_hammer.attack1",
-    attackTime: 38,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 20,
-    hitFrames: [15, 16],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 15,
+    hitFrames: [12, 13],
     range: 3,
     coneDeg: 80,
     damageMultiplier: 1.15
   },
   {
     animation: "animation.copper_hammer.attack2",
-    attackTime: 38,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 20,
-    hitFrames: [17, 18],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 15,
+    hitFrames: [13, 14],
     range: 3.5,
     coneDeg: 85,
     damageMultiplier: 2
@@ -968,30 +974,30 @@ var KNOCKBACK_VERTICAL2 = 0.3;
 var ANIMS5 = [
   {
     animation: "animation.diamond_greatsword.attack",
-    attackTime: 44,
-    nextAttackWindow: 8,
-    cancelIntoNextTick: 30,
-    hitFrames: [25, 26],
+    attackTime: 30,
+    nextAttackWindow: 6,
+    cancelIntoNextTick: 21,
+    hitFrames: [17, 18],
     range: 4.5,
     coneDeg: 80,
     damageMultiplier: 1
   },
   {
     animation: "animation.diamond_greatsword.attack1",
-    attackTime: 46,
-    nextAttackWindow: 8,
-    cancelIntoNextTick: 32,
-    hitFrames: [25, 26],
+    attackTime: 32,
+    nextAttackWindow: 6,
+    cancelIntoNextTick: 22,
+    hitFrames: [17, 18],
     range: 5,
     coneDeg: 85,
     damageMultiplier: 1.2
   },
   {
     animation: "animation.diamond_greatsword.attack2",
-    attackTime: 60,
-    nextAttackWindow: 12,
-    cancelIntoNextTick: 44,
-    hitFrames: [31, 32],
+    attackTime: 41,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 30,
+    hitFrames: [21, 22],
     // finisher — paling lambat, paling sakit
     range: 5.3,
     coneDeg: 180,
@@ -1201,30 +1207,30 @@ var KNOCKBACK_VERTICAL3 = 0.06;
 var ANIMS6 = [
   {
     animation: "animation.netherite_relic_blade.attack",
-    attackTime: 34,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 20,
-    hitFrames: [14],
+    attackTime: 26,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 15,
+    hitFrames: [11],
     range: 3.5,
     coneDeg: 90,
     damageMultiplier: 1
   },
   {
     animation: "animation.netherite_relic_blade.attack1",
-    attackTime: 35,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 25,
-    hitFrames: [17],
+    attackTime: 27,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 19,
+    hitFrames: [13],
     range: 4.5,
     coneDeg: 70,
     damageMultiplier: 1.15
   },
   {
     animation: "animation.netherite_relic_blade.attack2",
-    attackTime: 42,
-    nextAttackWindow: 8,
-    cancelIntoNextTick: 20,
-    hitFrames: [17],
+    attackTime: 32,
+    nextAttackWindow: 6,
+    cancelIntoNextTick: 15,
+    hitFrames: [13],
     // finisher — sedikit lebih lambat, multiplier tertinggi
     range: 4,
     coneDeg: 80,
@@ -1466,30 +1472,30 @@ var KNOCKBACK_VERTICAL4 = 0.04;
 var NORMAL_ANIMS = [
   {
     animation: "animation.redstone_pulse_gauntlet.attack",
-    attackTime: 38,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 22,
-    hitFrames: [21],
+    attackTime: 30,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 18,
+    hitFrames: [17],
     range: 2.5,
     coneDeg: 76,
     damageMultiplier: 1
   },
   {
     animation: "animation.redstone_pulse_gauntlet.attack1",
-    attackTime: 38,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 18,
-    hitFrames: [17],
+    attackTime: 30,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 14,
+    hitFrames: [14],
     range: 2.5,
     coneDeg: 80,
     damageMultiplier: 1.1
   },
   {
     animation: "animation.redstone_pulse_gauntlet.attack2",
-    attackTime: 36,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 17,
-    hitFrames: [16],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 14,
+    hitFrames: [13],
     range: 2.7,
     coneDeg: 84,
     damageMultiplier: 1.25
@@ -1498,30 +1504,30 @@ var NORMAL_ANIMS = [
 var FAST_ANIMS = [
   {
     animation: "animation.redstone_pulse_gauntlet.fast_attack",
-    attackTime: 38,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 15,
-    hitFrames: [14],
+    attackTime: 30,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 12,
+    hitFrames: [11],
     range: 2.5,
     coneDeg: 78,
     damageMultiplier: 1.05
   },
   {
     animation: "animation.redstone_pulse_gauntlet.fast_attack1",
-    attackTime: 36,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 12,
-    hitFrames: [11],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 10,
+    hitFrames: [9],
     range: 2.5,
     coneDeg: 82,
     damageMultiplier: 1.15
   },
   {
     animation: "animation.redstone_pulse_gauntlet.fast_attack2",
-    attackTime: 36,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 12,
-    hitFrames: [11],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 10,
+    hitFrames: [9],
     range: 2.7,
     coneDeg: 86,
     damageMultiplier: 1.3
@@ -1530,30 +1536,30 @@ var FAST_ANIMS = [
 var MAX_ANIMS = [
   {
     animation: "animation.redstone_pulse_gauntlet.fast_attack3",
-    attackTime: 36,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 12,
-    hitFrames: [11],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 10,
+    hitFrames: [9],
     range: 3.3,
     coneDeg: 80,
     damageMultiplier: 1.1
   },
   {
     animation: "animation.redstone_pulse_gauntlet.fast_attack1",
-    attackTime: 36,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 12,
-    hitFrames: [11],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 10,
+    hitFrames: [9],
     range: 2.5,
     coneDeg: 82,
     damageMultiplier: 1.15
   },
   {
     animation: "animation.redstone_pulse_gauntlet.fast_attack2",
-    attackTime: 36,
-    nextAttackWindow: 10,
-    cancelIntoNextTick: 12,
-    hitFrames: [11],
+    attackTime: 29,
+    nextAttackWindow: 8,
+    cancelIntoNextTick: 10,
+    hitFrames: [9],
     range: 2.7,
     coneDeg: 86,
     damageMultiplier: 1.3
@@ -1860,16 +1866,16 @@ var ANIMS7 = [
      * Shorter than Greatsword because Crescent is intended
      * to feel agile and controlled.
      */
-    attackTime: 45,
-    nextAttackWindow: 12,
-    cancelIntoNextTick: 45,
+    attackTime: 38,
+    nextAttackWindow: 10,
+    cancelIntoNextTick: 38,
     /**
      * Two adjacent hit frames create a small hit window.
      *
      * Guarded by hitAppliedThisSwing so one target cannot
      * receive damage twice from the same swing.
      */
-    hitFrames: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
+    hitFrames: [12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
     range: 5.5,
     coneDeg: 85,
     damageMultiplier: 1
