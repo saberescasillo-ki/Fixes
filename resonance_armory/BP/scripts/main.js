@@ -265,18 +265,51 @@ function startAttack(player, state, cfg, setState9) {
   const lastHit = anim.hitFrames.length ? anim.hitFrames[anim.hitFrames.length - 1] : anim.attackTime;
   const lockTicks = anim.movementLockTicks ?? Math.min(anim.attackTime, lastHit + MOVEMENT_LOCK_AFTER_HIT_TICKS);
   lockInputAndSuppressVanilla(player, lockTicks, state);
-  player.playAnimation(anim.animation, { controller: cfg.animController, blendOutTime: cfg.blendOutSeconds ?? ATTACK_BLEND_OUT_SECONDS });
+  playAttackAnimations(player, anim, cfg);
   setState9(player, state);
 }
-function bufferNextAttack(player, state, setState9) {
+// Tercera y primera persona usan animaciones distintas: la de combo (cuerpo
+// entero) se corta en la vista de primera persona y la "fp_" (solo el brazo,
+// pensada para la camara) se corta en tercera. Cada cliente ve solo la suya.
+var FIRST_PERSON_STOP = "variable.is_first_person";
+var THIRD_PERSON_STOP = "!variable.is_first_person";
+var firstPersonName = (animation) => animation.replace(/\.([^.]+)$/, ".fp_$1");
+function playAttackAnimations(player, anim, cfg) {
+  const blendOutTime = cfg.blendOutSeconds ?? ATTACK_BLEND_OUT_SECONDS;
+  player.playAnimation(anim.animation, { controller: cfg.animController, blendOutTime, stopExpression: FIRST_PERSON_STOP });
+  try {
+    player.playAnimation(firstPersonName(anim.animation), { controller: cfg.animController + ".fp", blendOutTime: 0.15, stopExpression: THIRD_PERSON_STOP });
+  } catch {
+  }
+}
+// Pulsar atacar durante un ataque solo deja el siguiente golpe "en cola": no
+// reinicia nada. Ademas mantiene al jugador plantado hasta que el golpe en
+// cola empieza, para que no se deslice entre un golpe y otro.
+function bufferNextAttack(player, state, setState9, cfg) {
   state.bufferedNext = true;
+  const anim = cfg?.anims?.[state.comboIndex % cfg.anims.length];
+  if (anim) lockInputAndSuppressVanilla(player, Math.max(1, anim.cancelIntoNextTick - state.frame + 2), state);
   setState9(player, state);
+}
+// Paso de ataque: antes cada frame de golpe empujaba al jugador hacia delante
+// con fuerza 1 (y dos veces en armas con dos hit frames), lo que lo arrastraba
+// por el suelo. Ahora solo se aplica en el primer hit frame y con la fuerza de
+// ATTACK_STEP_STRENGTH (0 = el jugador se queda clavado en el sitio).
+var ATTACK_STEP_STRENGTH = 0;
+function attackStep(player, dir, anim, state) {
+  if (state.frame !== anim.hitFrames[0]) return;
+  try {
+    player.applyKnockback({ x: dir.x * ATTACK_STEP_STRENGTH, z: dir.z * ATTACK_STEP_STRENGTH }, 0);
+  } catch {
+  }
 }
 var RESET_ANIMATION = "animation.resonance.reset";
 function endAttackAnimation(player, cfg) {
-  try {
-    player.playAnimation(RESET_ANIMATION, { controller: cfg.animController, blendOutTime: 0 });
-  } catch {
+  for (const controller of [cfg.animController, cfg.animController + ".fp"]) {
+    try {
+      player.playAnimation(RESET_ANIMATION, { controller, blendOutTime: 0 });
+    } catch {
+    }
   }
 }
 function handleComboTransitionOrEnd(player, state, cfg, setState9) {
@@ -320,7 +353,7 @@ var ANIMS = [
     animation: "animation.smoke_club.attack",
     attackTime: 25,
     nextAttackWindow: 5,
-    cancelIntoNextTick: 11,
+    cancelIntoNextTick: 14,
     hitFrames: [9, 10],
     range: 2.8,
     coneDeg: 75,
@@ -331,7 +364,7 @@ var ANIMS = [
     animation: "animation.smoke_club.attack1",
     attackTime: 25,
     nextAttackWindow: 5,
-    cancelIntoNextTick: 11,
+    cancelIntoNextTick: 14,
     hitFrames: [9, 10],
     range: 3.2,
     coneDeg: 80,
@@ -342,7 +375,7 @@ var ANIMS = [
     animation: "animation.smoke_club.attack2",
     attackTime: 25,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 11,
+    cancelIntoNextTick: 25,
     hitFrames: [9, 10],
     range: 3,
     coneDeg: 85,
@@ -409,7 +442,7 @@ function tickWeapon(player) {
   if (anim.hitFrames.includes(state.frame)) {
     const targets = getTargetsInCone(player, anim.range, anim.coneDeg, 10);
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x, z: dir.z }, 0);
+    attackStep(player, dir, anim, state);
     if (targets.length > 0) {
       const dmg = calcDamage(anim);
       for (const t of targets) applyHit(player, t, dmg);
@@ -435,7 +468,7 @@ onWeaponHit((ev) => {
     const s = getState(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState);
+      bufferNextAttack(attacker, s, setState, COMBO_CFG);
       return;
     }
     startAttack(attacker, s, COMBO_CFG, setState);
@@ -460,7 +493,7 @@ var ANIMS2 = [
     animation: "animation.iron_halberd.attack",
     attackTime: 25,
     nextAttackWindow: 5,
-    cancelIntoNextTick: 16,
+    cancelIntoNextTick: 17,
     hitFrames: [5, 6],
     range: 3.7,
     coneDeg: 75,
@@ -470,7 +503,7 @@ var ANIMS2 = [
     animation: "animation.iron_halberd.attack1",
     attackTime: 24,
     nextAttackWindow: 5,
-    cancelIntoNextTick: 16,
+    cancelIntoNextTick: 12,
     hitFrames: [5],
     range: 3.3,
     coneDeg: 80,
@@ -480,7 +513,7 @@ var ANIMS2 = [
     animation: "animation.iron_halberd.attack2",
     attackTime: 25,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 16,
+    cancelIntoNextTick: 25,
     hitFrames: [5, 6],
     range: 3.5,
     coneDeg: 85,
@@ -566,7 +599,7 @@ function tickWeapon2(player) {
       hitSomething = true;
     }
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x, z: dir.z }, 0);
+    attackStep(player, dir, anim, state);
     try {
       world2.getDimension(player.dimension.id).playSound("random.anvil_land", player.location, { volume: 0.5, pitch: 1.5 });
       if (hitSomething) player.runCommand("execute as @s run camerashake add @s 0.3 0.3");
@@ -583,7 +616,7 @@ onWeaponHit((ev) => {
     const s = getState2(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState2);
+      bufferNextAttack(attacker, s, setState2, COMBO_CFG2);
       return;
     }
     startAttack(attacker, s, COMBO_CFG2, setState2);
@@ -608,7 +641,7 @@ var ANIMS3 = [
     animation: "animation.golden_rapier.attack",
     attackTime: 16,
     nextAttackWindow: 2,
-    cancelIntoNextTick: 10,
+    cancelIntoNextTick: 8,
     hitFrames: [4],
     range: 5.5,
     coneDeg: 70,
@@ -628,7 +661,7 @@ var ANIMS3 = [
     animation: "animation.golden_rapier.attack2",
     attackTime: 15,
     nextAttackWindow: 3,
-    cancelIntoNextTick: 5,
+    cancelIntoNextTick: 15,
     hitFrames: [1, 2],
     range: 5.5,
     coneDeg: 80,
@@ -750,7 +783,7 @@ onWeaponHit((ev) => {
     const s = getState3(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState3);
+      bufferNextAttack(attacker, s, setState3, COMBO_CFG3);
       return;
     }
     startAttack(attacker, s, COMBO_CFG3, setState3);
@@ -778,7 +811,7 @@ var ANIMS4 = [
     animation: "animation.copper_hammer.attack",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 14,
+    cancelIntoNextTick: 20,
     hitFrames: [13],
     range: 3,
     coneDeg: 75,
@@ -788,7 +821,7 @@ var ANIMS4 = [
     animation: "animation.copper_hammer.attack1",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 15,
+    cancelIntoNextTick: 17,
     hitFrames: [12, 13],
     range: 3,
     coneDeg: 80,
@@ -798,7 +831,7 @@ var ANIMS4 = [
     animation: "animation.copper_hammer.attack2",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 15,
+    cancelIntoNextTick: 29,
     hitFrames: [13, 14],
     range: 3.5,
     coneDeg: 85,
@@ -899,7 +932,7 @@ function tickWeapon4(player) {
   if (anim.hitFrames.includes(state.frame)) {
     const targets = getTargetsInCone(player, anim.range, anim.coneDeg, 10);
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x, z: dir.z }, 0);
+    attackStep(player, dir, anim, state);
     if (targets.length > 0) {
       const dmg = calcDamage3(anim);
       for (const t of targets) applyHit4(player, t, dmg);
@@ -921,7 +954,7 @@ onWeaponHit((ev) => {
     const s = getState4(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState4);
+      bufferNextAttack(attacker, s, setState4, COMBO_CFG4);
       return;
     }
     startAttack(attacker, s, COMBO_CFG4, setState4);
@@ -979,7 +1012,7 @@ var ANIMS5 = [
     animation: "animation.diamond_greatsword.attack",
     attackTime: 30,
     nextAttackWindow: 6,
-    cancelIntoNextTick: 21,
+    cancelIntoNextTick: 27,
     hitFrames: [17, 18],
     range: 4.5,
     coneDeg: 80,
@@ -989,7 +1022,7 @@ var ANIMS5 = [
     animation: "animation.diamond_greatsword.attack1",
     attackTime: 32,
     nextAttackWindow: 6,
-    cancelIntoNextTick: 22,
+    cancelIntoNextTick: 27,
     hitFrames: [17, 18],
     range: 5,
     coneDeg: 85,
@@ -999,7 +1032,7 @@ var ANIMS5 = [
     animation: "animation.diamond_greatsword.attack2",
     attackTime: 41,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 30,
+    cancelIntoNextTick: 41,
     hitFrames: [21, 22],
     // finisher — paling lambat, paling sakit
     range: 5.3,
@@ -1008,7 +1041,7 @@ var ANIMS5 = [
   }
 ];
 var CONFIG = {
-  blendOutSeconds: 0.05,
+  blendOutSeconds: 0.25,
   anims: ANIMS5,
   animController: ANIM_CONTROLLER5,
   inputCooldownTicks: INPUT_COOLDOWN_TICKS5,
@@ -1152,7 +1185,7 @@ function tickGreatsword(player) {
     }
     state.fractureAppliedThisSwing = true;
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x, z: dir.z }, 0);
+    attackStep(player, dir, anim, state);
     if (targets.length > 0) {
       try {
         world5.getDimension(player.dimension.id).playSound(
@@ -1178,7 +1211,7 @@ onWeaponHit((ev) => {
     const s = getState5(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState5);
+      bufferNextAttack(attacker, s, setState5, CONFIG);
       return;
     }
     s.fractureAppliedThisSwing = false;
@@ -1212,7 +1245,7 @@ var ANIMS6 = [
     animation: "animation.netherite_relic_blade.attack",
     attackTime: 26,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 15,
+    cancelIntoNextTick: 19,
     hitFrames: [11],
     range: 3.5,
     coneDeg: 90,
@@ -1222,7 +1255,7 @@ var ANIMS6 = [
     animation: "animation.netherite_relic_blade.attack1",
     attackTime: 27,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 19,
+    cancelIntoNextTick: 20,
     hitFrames: [13],
     range: 4.5,
     coneDeg: 70,
@@ -1232,7 +1265,7 @@ var ANIMS6 = [
     animation: "animation.netherite_relic_blade.attack2",
     attackTime: 32,
     nextAttackWindow: 6,
-    cancelIntoNextTick: 15,
+    cancelIntoNextTick: 32,
     hitFrames: [13],
     // finisher — sedikit lebih lambat, multiplier tertinggi
     range: 4,
@@ -1416,7 +1449,7 @@ function tickWeapon5(player) {
     }
     state.burdenAppliedThisSwing = true;
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x, z: dir.z }, 0);
+    attackStep(player, dir, anim, state);
     if (hitSomething) {
       try {
         world6.getDimension(player.dimension.id).playSound("random.break", player.location, {
@@ -1438,7 +1471,7 @@ onWeaponHit((ev) => {
     const s = getState6(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState6);
+      bufferNextAttack(attacker, s, setState6, COMBO_CFG5);
       return;
     }
     s.burdenAppliedThisSwing = false;
@@ -1477,7 +1510,7 @@ var NORMAL_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.attack",
     attackTime: 30,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 18,
+    cancelIntoNextTick: 21,
     hitFrames: [17],
     range: 2.5,
     coneDeg: 76,
@@ -1487,7 +1520,7 @@ var NORMAL_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.attack1",
     attackTime: 30,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 14,
+    cancelIntoNextTick: 18,
     hitFrames: [14],
     range: 2.5,
     coneDeg: 80,
@@ -1497,7 +1530,7 @@ var NORMAL_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.attack2",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 14,
+    cancelIntoNextTick: 29,
     hitFrames: [13],
     range: 2.7,
     coneDeg: 84,
@@ -1509,7 +1542,7 @@ var FAST_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.fast_attack",
     attackTime: 30,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 12,
+    cancelIntoNextTick: 15,
     hitFrames: [11],
     range: 2.5,
     coneDeg: 78,
@@ -1519,7 +1552,7 @@ var FAST_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.fast_attack1",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 10,
+    cancelIntoNextTick: 13,
     hitFrames: [9],
     range: 2.5,
     coneDeg: 82,
@@ -1529,7 +1562,7 @@ var FAST_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.fast_attack2",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 10,
+    cancelIntoNextTick: 13,
     hitFrames: [9],
     range: 2.7,
     coneDeg: 86,
@@ -1541,7 +1574,7 @@ var MAX_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.fast_attack3",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 10,
+    cancelIntoNextTick: 13,
     hitFrames: [9],
     range: 3.3,
     coneDeg: 80,
@@ -1551,7 +1584,7 @@ var MAX_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.fast_attack1",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 10,
+    cancelIntoNextTick: 13,
     hitFrames: [9],
     range: 2.5,
     coneDeg: 82,
@@ -1561,7 +1594,7 @@ var MAX_ANIMS = [
     animation: "animation.redstone_pulse_gauntlet.fast_attack2",
     attackTime: 29,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 10,
+    cancelIntoNextTick: 13,
     hitFrames: [9],
     range: 2.7,
     coneDeg: 86,
@@ -1777,7 +1810,7 @@ function tickWeapon6(player) {
   if (anim.hitFrames.includes(state.frame)) {
     const targets = getTargetsInCone(player, anim.range, anim.coneDeg, 10);
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x, z: dir.z }, 0);
+    attackStep(player, dir, anim, state);
     if (targets.length > 0) {
       const baseDmg = calcDamage6(anim);
       const capacitorReady = !state.capacitorConsumedThisSwing && isCapacitorReady(state);
@@ -1829,7 +1862,7 @@ onWeaponHit((ev) => {
     const s = getState7(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState7);
+      bufferNextAttack(attacker, s, setState7, getRuntimeConfig(s));
       return;
     }
     s.cycleTierLocked = s.overclockTier;
@@ -2095,7 +2128,7 @@ function tickWeapon7(player) {
     }
     if (state.frame === anim.hitFrames[0]) {
       const direction = player.getViewDirection();
-      player.applyKnockback({ x: direction.x * 0.35, z: direction.z * 0.35 }, 0);
+      attackStep(player, direction, anim, state);
     }
     if (hitSomething) {
       state.hitAppliedThisSwing = true;
@@ -2122,7 +2155,7 @@ onWeaponHit((ev) => {
     const state = getState8(attacker);
     resetAttackingFlagIfNeeded(attacker, state);
     if (state.isAttacking) {
-      bufferNextAttack(attacker, state, setState8);
+      bufferNextAttack(attacker, state, setState8, CONFIG2);
       return;
     }
     state.hitAppliedThisSwing = false;
@@ -2154,30 +2187,30 @@ var CHIME_SPEED_TICKS = 50;
 var ANIMS9 = [
   {
     animation: "animation.amethyst_glaive.attack",
-    attackTime: 15,
+    attackTime: 16,
     nextAttackWindow: 4,
-    cancelIntoNextTick: 9,
-    hitFrames: [6, 7],
+    cancelIntoNextTick: 16,
+    hitFrames: [7, 8],
     range: 4.2,
     coneDeg: 40,
     damageMultiplier: 1
   },
   {
     animation: "animation.amethyst_glaive.attack1",
-    attackTime: 17,
+    attackTime: 18,
     nextAttackWindow: 4,
-    cancelIntoNextTick: 11,
-    hitFrames: [7, 8],
+    cancelIntoNextTick: 18,
+    hitFrames: [8, 9],
     range: 3.8,
     coneDeg: 150,
     damageMultiplier: 1.1
   },
   {
     animation: "animation.amethyst_glaive.attack2",
-    attackTime: 20,
+    attackTime: 21,
     nextAttackWindow: 6,
-    cancelIntoNextTick: 13,
-    hitFrames: [9, 10],
+    cancelIntoNextTick: 21,
+    hitFrames: [10, 11],
     range: 4,
     coneDeg: 70,
     damageMultiplier: 1.4
@@ -2289,7 +2322,7 @@ function tickWeapon9(player) {
   if (anim.hitFrames.includes(state.frame)) {
     const targets = getTargetsInCone(player, anim.range, anim.coneDeg, 10);
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x, z: dir.z }, 0);
+    attackStep(player, dir, anim, state);
     for (const t of targets) {
       applyHit9(player, t, calcDamage9(anim));
       if (!state.resonanceAppliedThisSwing) {
@@ -2316,7 +2349,7 @@ onWeaponHit((ev) => {
     const s = getState9(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState9);
+      bufferNextAttack(attacker, s, setState9, COMBO_CFG9);
       return;
     }
     s.resonanceAppliedThisSwing = false;
@@ -2345,8 +2378,8 @@ var ANIMS10 = [
     animation: "animation.blaze_scimitar.attack",
     attackTime: 13,
     nextAttackWindow: 3,
-    cancelIntoNextTick: 8,
-    hitFrames: [5, 6],
+    cancelIntoNextTick: 13,
+    hitFrames: [6, 7],
     range: 3,
     coneDeg: 90,
     damageMultiplier: 1
@@ -2355,8 +2388,8 @@ var ANIMS10 = [
     animation: "animation.blaze_scimitar.attack1",
     attackTime: 13,
     nextAttackWindow: 3,
-    cancelIntoNextTick: 8,
-    hitFrames: [5, 6],
+    cancelIntoNextTick: 13,
+    hitFrames: [6, 7],
     range: 3,
     coneDeg: 90,
     damageMultiplier: 1.1
@@ -2365,7 +2398,7 @@ var ANIMS10 = [
     animation: "animation.blaze_scimitar.attack2",
     attackTime: 18,
     nextAttackWindow: 5,
-    cancelIntoNextTick: 12,
+    cancelIntoNextTick: 18,
     hitFrames: [8, 9],
     range: 3.2,
     coneDeg: 70,
@@ -2480,7 +2513,7 @@ function tickWeapon10(player) {
   if (anim.hitFrames.includes(state.frame)) {
     const targets = getTargetsInCone(player, anim.range, anim.coneDeg, 10);
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x, z: dir.z }, 0);
+    attackStep(player, dir, anim, state);
     if (targets.length > 0) {
       const dmg = calcDamage10(anim);
       let burningHit = false;
@@ -2514,7 +2547,7 @@ onWeaponHit((ev) => {
     const s = getState10(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState10);
+      bufferNextAttack(attacker, s, setState10, COMBO_CFG10);
       return;
     }
     s.emberAppliedThisSwing = false;
@@ -2541,30 +2574,30 @@ var BOOM_COOLDOWN_TICKS = 50;
 var ANIMS11 = [
   {
     animation: "animation.echo_maul.attack",
-    attackTime: 22,
+    attackTime: 23,
     nextAttackWindow: 6,
-    cancelIntoNextTick: 14,
-    hitFrames: [10, 11],
+    cancelIntoNextTick: 23,
+    hitFrames: [11, 12],
     range: 3.8,
     coneDeg: 70,
     damageMultiplier: 1
   },
   {
     animation: "animation.echo_maul.attack1",
-    attackTime: 20,
+    attackTime: 21,
     nextAttackWindow: 6,
-    cancelIntoNextTick: 13,
-    hitFrames: [9, 10],
+    cancelIntoNextTick: 21,
+    hitFrames: [10, 11],
     range: 3.8,
     coneDeg: 160,
     damageMultiplier: 1.1
   },
   {
     animation: "animation.echo_maul.attack2",
-    attackTime: 26,
+    attackTime: 27,
     nextAttackWindow: 8,
-    cancelIntoNextTick: 17,
-    hitFrames: [12, 13],
+    cancelIntoNextTick: 27,
+    hitFrames: [13, 14],
     range: 4,
     coneDeg: 360,
     damageMultiplier: 1.5
@@ -2650,7 +2683,7 @@ function tickWeapon11(player) {
   if (anim.hitFrames.includes(state.frame)) {
     const targets = getTargetsInCone(player, anim.range, anim.coneDeg, 12);
     const dir = player.getViewDirection();
-    player.applyKnockback({ x: dir.x * 0.6, z: dir.z * 0.6 }, 0);
+    attackStep(player, dir, anim, state);
     if (!state.pulseFiredThisSwing) {
       state.pulseFiredThisSwing = true;
       const dmg = calcDamage11(anim);
@@ -2674,7 +2707,7 @@ onWeaponHit((ev) => {
     const s = getState11(attacker);
     resetAttackingFlagIfNeeded(attacker, s);
     if (s.isAttacking) {
-      bufferNextAttack(attacker, s, setState11);
+      bufferNextAttack(attacker, s, setState11, COMBO_CFG11);
       return;
     }
     s.pulseFiredThisSwing = false;

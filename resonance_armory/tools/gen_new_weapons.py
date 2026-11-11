@@ -276,35 +276,67 @@ def build_geometry(wid, bone, img):
 
 
 # ---------------------------------------------------------------------------
-# Animaciones
+# Animaciones (horneadas tick a tick)
 # ---------------------------------------------------------------------------
-def kf(keys):
-    """keys: lista (tiempo, valor). Intermedios -> catmullrom."""
+# Cada canal se define con poses clave (tick, valor, curva). La curva describe
+# como se LLEGA a esa pose:
+#   "out"  sale rapido y frena      (anticipacion, inercia tras el golpe)
+#   "in"   arranca lento y acelera  (el golpe en si)
+#   "io"   suave en ambos extremos  (recuperacion)
+# Se hornea a un keyframe lineal por tick (0.05 s): el resultado no depende de
+# como interpole Bedrock y no hay sobrepasos raros de catmullrom.
+# Todos los ataques empiezan y acaban en la pose neutra (0,0,0), asi no hay
+# salto ni al empezar ni al encadenar el siguiente golpe del combo.
+TICK = 0.05
+Z = [0, 0, 0]
+
+
+def _ease(u, mode):
+    if mode == "out":
+        return 1 - (1 - u) ** 2
+    if mode == "in":
+        return u ** 2.2
+    if mode == "lin":
+        return u
+    return u * u * (3 - 2 * u)
+
+
+def bake(keys, end):
     keys = sorted(keys, key=lambda k: k[0])
+    if keys[0][0] != 0:
+        keys.insert(0, (0, Z, "io"))
+    if keys[-1][0] < end:
+        keys.append((end, Z, "io"))
     out = {}
-    n = len(keys)
-    for i, (t, v) in enumerate(keys):
-        ts = ("%.4f" % t).rstrip("0").rstrip(".")
+    for t in range(0, end + 1):
+        for i in range(len(keys) - 1):
+            a, b = keys[i], keys[i + 1]
+            if a[0] <= t <= b[0]:
+                u = (t - a[0]) / max(1, b[0] - a[0])
+                mode = b[2] if len(b) > 2 else "io"
+                if a[0] == 0 and mode == "out":
+                    mode = "io"  # la anticipacion arranca suave desde neutro
+                e = _ease(u, mode)
+                v = [round(a[1][j] + (b[1][j] - a[1][j]) * e, 3) for j in range(3)]
+                break
+        ts = ("%.2f" % (t * TICK)).rstrip("0").rstrip(".")
         if "." not in ts:
             ts += ".0"
-        out[ts] = v if (i == 0 or i == n - 1) else {"post": v, "lerp_mode": "catmullrom"}
+        out[ts] = v
     return out
 
 
-def bone_anim(rot=None, pos=None):
-    b = {}
-    if rot:
-        b["rotation"] = kf(rot)
-    if pos:
-        b["position"] = kf(pos)
-    return b
-
-
-def attack(length, bones):
-    return {"loop": "hold_on_last_frame", "animation_length": length, "bones": bones}
-
-
-Z = [0, 0, 0]
+def attack(end, bones):
+    """bones: {hueso: {"rot": [(tick, [x,y,z], curva)...], "pos": [...]}}"""
+    out = {}
+    for name, ch in bones.items():
+        b = {}
+        if "rot" in ch:
+            b["rotation"] = bake(list(ch["rot"]), end)
+        if "pos" in ch:
+            b["position"] = bake(list(ch["pos"]), end)
+        out[name] = b
+    return {"loop": "hold_on_last_frame", "animation_length": round(end * TICK, 2), "bones": out}
 
 
 def idle(bone, amp=1.0):
@@ -320,158 +352,172 @@ def idle(bone, amp=1.0):
     }
 
 
+def strike(win, hit, fol, end, bones):
+    """Atajo para el patron anticipacion -> golpe -> inercia -> recuperacion.
+
+    bones: {hueso: {"rot": (W, S, F), "pos": (W, S, F)}} con W = pose de
+    anticipacion (tick win), S = pose en el impacto (tick hit) y F = pose de
+    inercia (tick fol). Vuelve a neutro en `end`.
+    """
+    out = {}
+    for name, ch in bones.items():
+        out[name] = {}
+        for key in ("rot", "pos"):
+            if key in ch:
+                w, s, f = ch[key]
+                out[name][key] = [(0, Z), (win, w, "out"), (hit, s, "in"), (fol, f, "out"), (end, Z, "io")]
+    return attack(end, out)
+
+
+# Tiempos (en ticks) de cada ataque nuevo: (anticipacion, impacto, inercia, fin).
+# El script (BP/scripts/main.js) usa los mismos valores para hitFrames/attackTime.
+TIMING = {
+    "amethyst_glaive": [(4, 7, 10, 16), (5, 8, 11, 18), (6, 10, 13, 21)],
+    "blaze_scimitar": [(3, 6, 8, 13), (3, 6, 8, 13), (4, 8, 11, 18)],
+    "echo_maul": [(7, 11, 14, 23), (6, 10, 13, 21), (5, 13, 16, 27)],
+}
+
+
 def glaive_anims():
-    a = {}
-    a["idle"] = idle("glaive")
-    # estocada
-    a["attack"] = attack(0.75, {
-        "root": bone_anim(pos=[(0, Z), (0.15, [0, 0, 1]), (0.3, [0, 0, -2]), (0.5, [0, 0, -1]), (0.75, Z)]),
-        "waist": bone_anim(rot=[(0, Z), (0.15, [0, -14, 0]), (0.3, [4, 16, 0]), (0.75, Z)]),
-        "body": bone_anim(rot=[(0, Z), (0.15, [-4, -18, 0]), (0.3, [8, 20, 0]), (0.5, [5, 12, 0]), (0.75, Z)]),
-        "head": bone_anim(rot=[(0, Z), (0.15, [0, 18, 0]), (0.3, [-6, -14, 0]), (0.75, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [-60, -20, 5]), (0.15, [-48, -28, 8]), (0.3, [-96, 4, 2]), (0.5, [-90, 0, 2]), (0.75, Z)],
-            pos=[(0, [0, 0, 2]), (0.15, [0, 0, 3]), (0.3, [1, 0, -3]), (0.5, [0, 0, -2]), (0.75, Z)]),
-        "leftArm": bone_anim(
-            rot=[(0, [-70, 32, 0]), (0.15, [-62, 36, 0]), (0.3, [-88, 18, 0]), (0.5, [-84, 20, 0]), (0.75, Z)],
-            pos=[(0, [-2, 0, 0]), (0.3, [-3, 0, -2]), (0.75, Z)]),
-        "rightItem": bone_anim(rot=[(0, Z), (0.3, [-6, 0, 0]), (0.75, Z)]),
-        "leftLeg": bone_anim(rot=[(0, Z), (0.3, [-22, 0, 0]), (0.75, Z)], pos=[(0, Z), (0.3, [0, 0, -2]), (0.75, Z)]),
-        "rightLeg": bone_anim(rot=[(0, Z), (0.3, [18, 0, 0]), (0.75, Z)]),
+    t = TIMING["amethyst_glaive"]
+    a = {"idle": idle("glaive")}
+    # 1) estocada: recoge el asta hacia atras y la clava al frente
+    a["attack"] = strike(*t[0], {
+        "root": {"pos": ([0, 0, 1.5], [0, -0.5, -2.5], [0, -0.3, -1.5])},
+        "waist": {"rot": ([0, -12, 0], [5, 14, 0], [3, 9, 0])},
+        "body": {"rot": ([-4, -20, 0], [9, 22, 0], [6, 14, 0])},
+        "head": {"rot": ([0, 18, 0], [-6, -16, 0], [-3, -9, 0])},
+        "rightArm": {"rot": ([-38, -26, 10], [-98, 6, 2], [-88, 2, 2]),
+                     "pos": ([0, 0, 3], [1, 0, -3.5], [0.5, 0, -2])},
+        "leftArm": {"rot": ([-52, 34, 0], [-90, 16, 0], [-80, 18, 0]),
+                    "pos": ([-1, 0, 1], [-3, 0, -2.5], [-2, 0, -1.5])},
+        "rightItem": {"rot": ([4, 0, 0], [-8, 0, 0], [-4, 0, 0])},
+        "leftLeg": {"rot": ([8, 0, 0], [-24, 0, 0], [-16, 0, 0]), "pos": ([0, 0, 0], [0, 0, -2], [0, 0, -1.2])},
+        "rightLeg": {"rot": ([-6, 0, 0], [20, 0, 0], [12, 0, 0])},
     })
-    # barrido horizontal
-    a["attack1"] = attack(0.85, {
-        "root": bone_anim(pos=[(0, Z), (0.35, [0, -1, -1]), (0.85, Z)]),
-        "waist": bone_anim(rot=[(0, [0, 18, 0]), (0.2, [0, 24, 0]), (0.4, [4, -22, 0]), (0.85, Z)]),
-        "body": bone_anim(rot=[(0, [-2, 28, 0]), (0.2, [-4, 36, 0]), (0.4, [6, -32, 0]), (0.6, [4, -20, 0]), (0.85, Z)]),
-        "head": bone_anim(rot=[(0, [0, -20, 0]), (0.4, [-4, 24, 0]), (0.85, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [-88, 58, 6]), (0.2, [-92, 70, 8]), (0.4, [-92, -56, 0]), (0.6, [-86, -44, 0]), (0.85, Z)],
-            pos=[(0, [0, 0, 1]), (0.4, [1, 0, -2]), (0.85, Z)]),
-        "leftArm": bone_anim(
-            rot=[(0, [-80, 42, -4]), (0.2, [-84, 50, -4]), (0.4, [-88, -24, 4]), (0.6, [-82, -16, 2]), (0.85, Z)],
-            pos=[(0, [-2, 0, 0]), (0.4, [-3, 0, -1]), (0.85, Z)]),
-        "rightItem": bone_anim(rot=[(0, [0, 0, 10]), (0.4, [0, 0, -14]), (0.85, Z)]),
-        "leftLeg": bone_anim(rot=[(0, [0, 10, 0]), (0.4, [-14, -8, 0]), (0.85, Z)]),
-        "rightLeg": bone_anim(rot=[(0, [0, 10, 0]), (0.4, [12, -8, 0]), (0.85, Z)]),
+    # 2) barrido horizontal amplio de derecha a izquierda
+    a["attack1"] = strike(*t[1], {
+        "root": {"pos": ([0, 0, 0.5], [0, -1, -1], [0, -0.8, -0.8])},
+        "waist": {"rot": ([0, 24, 0], [4, -14, 0], [4, -24, 0])},
+        "body": {"rot": ([-4, 38, 0], [6, -20, 0], [5, -34, 0])},
+        "head": {"rot": ([0, -24, 0], [-3, 14, 0], [-3, 24, 0])},
+        "rightArm": {"rot": ([-92, 70, 8], [-92, -30, 2], [-88, -58, 0]),
+                     "pos": ([0, 0, 1], [1, 0, -2], [1, 0, -1.5])},
+        "leftArm": {"rot": ([-84, 50, -4], [-88, -10, 2], [-84, -26, 4]),
+                    "pos": ([-2, 0, 0], [-3, 0, -1], [-3, 0, -1])},
+        "rightItem": {"rot": ([0, 0, 12], [0, 0, -6], [0, 0, -16])},
+        "leftLeg": {"rot": ([0, 12, 0], [-12, -4, 0], [-14, -8, 0])},
+        "rightLeg": {"rot": ([0, 12, 0], [10, -4, 0], [12, -8, 0])},
     })
-    # tajo descendente
-    a["attack2"] = attack(1.0, {
-        "root": bone_anim(pos=[(0, Z), (0.25, [0, 1, 0]), (0.45, [0, -2, -1]), (0.7, [0, -1, -1]), (1.0, Z)]),
-        "waist": bone_anim(rot=[(0, [-6, 0, 0]), (0.25, [-10, -6, 0]), (0.45, [16, 4, 0]), (0.7, [12, 2, 0]), (1.0, Z)]),
-        "body": bone_anim(rot=[(0, [-8, -6, 0]), (0.25, [-14, -10, 0]), (0.45, [24, 6, 0]), (0.7, [18, 4, 0]), (1.0, Z)]),
-        "head": bone_anim(rot=[(0, [6, 0, 0]), (0.25, [10, 0, 0]), (0.45, [-12, 0, 0]), (1.0, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [-150, -10, 10]), (0.25, [-176, -14, 12]), (0.45, [-58, 0, 6]), (0.7, [-62, 0, 6]), (1.0, Z)],
-            pos=[(0, [0, 0, 0]), (0.25, [0, 1, 1]), (0.45, [1, -1, -2]), (1.0, Z)]),
-        "leftArm": bone_anim(
-            rot=[(0, [-140, 18, -10]), (0.25, [-166, 22, -12]), (0.45, [-54, 12, -6]), (0.7, [-58, 12, -6]), (1.0, Z)],
-            pos=[(0, [-2, 0, 0]), (0.45, [-3, -1, -2]), (1.0, Z)]),
-        "rightItem": bone_anim(rot=[(0, Z), (0.25, [10, 0, 0]), (0.45, [-18, 0, 0]), (1.0, Z)]),
-        "leftLeg": bone_anim(rot=[(0, Z), (0.45, [-26, 0, 0]), (1.0, Z)], pos=[(0, Z), (0.45, [0, 0, -3]), (1.0, Z)]),
-        "rightLeg": bone_anim(rot=[(0, Z), (0.45, [16, 0, 0]), (1.0, Z)]),
+    # 3) tajo descendente a dos manos
+    a["attack2"] = strike(*t[2], {
+        "root": {"pos": ([0, 1, 0.5], [0, -2, -1], [0, -1.6, -1])},
+        "waist": {"rot": ([-10, -6, 0], [16, 4, 0], [12, 3, 0])},
+        "body": {"rot": ([-16, -10, 0], [26, 6, 0], [19, 4, 0])},
+        "head": {"rot": ([12, 0, 0], [-14, 0, 0], [-8, 0, 0])},
+        "rightArm": {"rot": ([-176, -14, 12], [-60, 0, 6], [-50, 0, 6]),
+                     "pos": ([0, 1, 1], [1, -1, -2], [1, -1.2, -1.5])},
+        "leftArm": {"rot": ([-166, 22, -12], [-56, 12, -6], [-46, 12, -6]),
+                    "pos": ([-2, 1, 0], [-3, -1, -2], [-3, -1.2, -1.5])},
+        "rightItem": {"rot": ([12, 0, 0], [-18, 0, 0], [-22, 0, 0])},
+        "leftLeg": {"rot": ([6, 0, 0], [-28, 0, 0], [-20, 0, 0]), "pos": ([0, 0, 0], [0, 0, -3], [0, 0, -2])},
+        "rightLeg": {"rot": ([-4, 0, 0], [18, 0, 0], [12, 0, 0])},
     })
     return a
 
 
 def scimitar_anims():
-    a = {}
-    a["idle"] = idle("scimitar", 1.3)
-    # tajo horizontal (derecha -> izquierda)
-    a["attack"] = attack(0.65, {
-        "root": bone_anim(pos=[(0, Z), (0.25, [0, 0, -1]), (0.65, Z)]),
-        "waist": bone_anim(rot=[(0, [0, -16, 0]), (0.12, [0, -22, 0]), (0.28, [2, 20, 0]), (0.65, Z)]),
-        "body": bone_anim(rot=[(0, [-2, -24, 0]), (0.12, [-4, -32, 0]), (0.28, [6, 28, 0]), (0.45, [4, 16, 0]), (0.65, Z)]),
-        "head": bone_anim(rot=[(0, [0, 16, 0]), (0.28, [-4, -18, 0]), (0.65, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [-72, -38, 12]), (0.12, [-96, -52, 16]), (0.28, [-88, 46, 4]), (0.45, [-70, 30, 4]), (0.65, Z)],
-            pos=[(0, [0, 0, 1]), (0.28, [0, 0, -2]), (0.65, Z)]),
-        "leftArm": bone_anim(rot=[(0, [-20, 10, -14]), (0.28, [-36, -12, -22]), (0.65, Z)]),
-        "rightItem": bone_anim(rot=[(0, [0, 0, 10]), (0.28, [8, 0, -32]), (0.65, Z)]),
-        "leftLeg": bone_anim(rot=[(0, [0, 8, 0]), (0.28, [-12, -6, 0]), (0.65, Z)]),
-        "rightLeg": bone_anim(rot=[(0, [0, 8, 0]), (0.28, [10, -6, 0]), (0.65, Z)]),
+    t = TIMING["blaze_scimitar"]
+    a = {"idle": idle("scimitar", 1.3)}
+    # 1) tajo horizontal rapido (derecha -> izquierda)
+    a["attack"] = strike(*t[0], {
+        "root": {"pos": ([0, 0, 0.5], [0, -0.3, -1.2], [0, -0.2, -0.8])},
+        "waist": {"rot": ([0, -20, 0], [2, 12, 0], [2, 20, 0])},
+        "body": {"rot": ([-4, -32, 0], [6, 16, 0], [5, 28, 0])},
+        "head": {"rot": ([0, 20, 0], [-3, -10, 0], [-3, -18, 0])},
+        "rightArm": {"rot": ([-96, -52, 16], [-90, 20, 6], [-80, 48, 4]),
+                     "pos": ([0, 0, 1], [0, 0, -2], [0, 0, -1.5])},
+        "leftArm": {"rot": ([-14, 12, -10], [-30, -8, -20], [-36, -12, -24])},
+        "rightItem": {"rot": ([0, 0, 14], [6, 0, -20], [8, 0, -34])},
+        "leftLeg": {"rot": ([0, 8, 0], [-10, -4, 0], [-12, -6, 0])},
+        "rightLeg": {"rot": ([0, 8, 0], [8, -4, 0], [10, -6, 0])},
     })
-    # reves
-    a["attack1"] = attack(0.65, {
-        "root": bone_anim(pos=[(0, Z), (0.25, [0, 0, -1]), (0.65, Z)]),
-        "waist": bone_anim(rot=[(0, [0, 18, 0]), (0.12, [0, 24, 0]), (0.28, [2, -20, 0]), (0.65, Z)]),
-        "body": bone_anim(rot=[(0, [-2, 26, 0]), (0.12, [-4, 34, 0]), (0.28, [6, -28, 0]), (0.45, [4, -14, 0]), (0.65, Z)]),
-        "head": bone_anim(rot=[(0, [0, -16, 0]), (0.28, [-4, 18, 0]), (0.65, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [-84, 48, 6]), (0.12, [-98, 62, 8]), (0.28, [-82, -44, 14]), (0.45, [-66, -26, 10]), (0.65, Z)],
-            pos=[(0, [0, 0, 1]), (0.28, [1, 0, -2]), (0.65, Z)]),
-        "leftArm": bone_anim(rot=[(0, [-30, -10, -20]), (0.28, [-18, 12, -12]), (0.65, Z)]),
-        "rightItem": bone_anim(rot=[(0, [0, 0, -24]), (0.28, [-8, 0, 36]), (0.65, Z)]),
-        "leftLeg": bone_anim(rot=[(0, [0, -8, 0]), (0.28, [12, 6, 0]), (0.65, Z)]),
-        "rightLeg": bone_anim(rot=[(0, [0, -8, 0]), (0.28, [-10, 6, 0]), (0.65, Z)]),
+    # 2) reves (izquierda -> derecha)
+    a["attack1"] = strike(*t[1], {
+        "root": {"pos": ([0, 0, 0.5], [0, -0.3, -1.2], [0, -0.2, -0.8])},
+        "waist": {"rot": ([0, 22, 0], [2, -12, 0], [2, -20, 0])},
+        "body": {"rot": ([-4, 34, 0], [6, -16, 0], [5, -28, 0])},
+        "head": {"rot": ([0, -20, 0], [-3, 10, 0], [-3, 18, 0])},
+        "rightArm": {"rot": ([-98, 62, 8], [-86, -20, 12], [-78, -46, 14]),
+                     "pos": ([0, 0, 1], [1, 0, -2], [1, 0, -1.5])},
+        "leftArm": {"rot": ([-30, -10, -20], [-20, 8, -14], [-16, 12, -12])},
+        "rightItem": {"rot": ([0, 0, -26], [-6, 0, 22], [-8, 0, 38])},
+        "leftLeg": {"rot": ([0, -8, 0], [10, 4, 0], [12, 6, 0])},
+        "rightLeg": {"rot": ([0, -8, 0], [-8, 4, 0], [-10, 6, 0])},
     })
-    # tajo ascendente con salto
-    a["attack2"] = attack(0.9, {
-        "root": bone_anim(pos=[(0, Z), (0.2, [0, -1.5, 0]), (0.4, [0, 3, -1]), (0.6, [0, 0, -1]), (0.9, Z)]),
-        "waist": bone_anim(rot=[(0, [6, 0, 0]), (0.2, [12, 6, 0]), (0.4, [-14, -4, 0]), (0.9, Z)]),
-        "body": bone_anim(rot=[(0, [8, 4, 0]), (0.2, [16, 10, 0]), (0.4, [-18, -8, 0]), (0.6, [-10, -4, 0]), (0.9, Z)]),
-        "head": bone_anim(rot=[(0, [-6, 0, 0]), (0.4, [10, 0, 0]), (0.9, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [-10, 0, 18]), (0.2, [28, 4, 26]), (0.4, [-156, -18, 10]), (0.6, [-118, -4, 6]), (0.9, Z)],
-            pos=[(0, Z), (0.2, [0, 0, 2]), (0.4, [0, 1, -2]), (0.9, Z)]),
-        "leftArm": bone_anim(rot=[(0, [-10, 0, -18]), (0.2, [20, 0, -26]), (0.4, [-60, 10, -30]), (0.9, Z)]),
-        "rightItem": bone_anim(rot=[(0, Z), (0.2, [20, 0, 0]), (0.4, [-34, 0, 0]), (0.9, Z)]),
-        "leftLeg": bone_anim(rot=[(0, Z), (0.2, [24, 0, 0]), (0.4, [-30, 0, 0]), (0.9, Z)]),
-        "rightLeg": bone_anim(rot=[(0, Z), (0.2, [24, 0, 0]), (0.4, [-14, 0, 0]), (0.9, Z)]),
+    # 3) tajo ascendente con pequeño salto
+    e = t[2][3]
+    a["attack2"] = attack(e, {
+        "root": {"pos": [(0, Z), (4, [0, -1.8, 0], "out"), (8, [0, 2.6, -1], "out"), (12, [0, -0.6, -1], "in"), (e, Z, "io")]},
+        "waist": {"rot": [(0, Z), (4, [12, 6, 0], "out"), (8, [-14, -4, 0], "in"), (11, [-8, -2, 0], "out"), (e, Z, "io")]},
+        "body": {"rot": [(0, Z), (4, [18, 10, 0], "out"), (8, [-20, -8, 0], "in"), (11, [-12, -4, 0], "out"), (e, Z, "io")]},
+        "head": {"rot": [(0, Z), (4, [-10, 0, 0], "out"), (8, [12, 0, 0], "in"), (e, Z, "io")]},
+        "rightArm": {"rot": [(0, Z), (4, [30, 4, 26], "out"), (8, [-158, -18, 10], "in"), (11, [-126, -6, 6], "out"), (e, Z, "io")],
+                     "pos": [(0, Z), (4, [0, 0, 2], "out"), (8, [0, 1, -2], "in"), (e, Z, "io")]},
+        "leftArm": {"rot": [(0, Z), (4, [22, 0, -26], "out"), (8, [-60, 10, -30], "in"), (11, [-40, 6, -22], "out"), (e, Z, "io")]},
+        "rightItem": {"rot": [(0, Z), (4, [22, 0, 0], "out"), (8, [-34, 0, 0], "in"), (11, [-24, 0, 0], "out"), (e, Z, "io")]},
+        "leftLeg": {"rot": [(0, Z), (4, [26, 0, 0], "out"), (8, [-30, 0, 0], "in"), (12, [-8, 0, 0], "out"), (e, Z, "io")]},
+        "rightLeg": {"rot": [(0, Z), (4, [26, 0, 0], "out"), (8, [-14, 0, 0], "in"), (12, [6, 0, 0], "out"), (e, Z, "io")]},
     })
     return a
 
 
 def maul_anims():
-    a = {}
-    a["idle"] = idle("maul", 0.8)
-    # golpe descendente
-    a["attack"] = attack(1.1, {
-        "root": bone_anim(pos=[(0, Z), (0.3, [0, 1, 1]), (0.5, [0, -2.5, -1]), (0.75, [0, -1.5, -1]), (1.1, Z)]),
-        "waist": bone_anim(rot=[(0, [-6, 0, 0]), (0.3, [-12, -4, 0]), (0.5, [18, 2, 0]), (0.75, [14, 2, 0]), (1.1, Z)]),
-        "body": bone_anim(rot=[(0, [-8, -6, 0]), (0.3, [-16, -8, 0]), (0.5, [26, 4, 0]), (0.75, [20, 4, 0]), (1.1, Z)]),
-        "head": bone_anim(rot=[(0, [6, 0, 0]), (0.3, [12, 0, 0]), (0.5, [-14, 0, 0]), (1.1, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [-150, -12, 16]), (0.3, [-184, -16, 18]), (0.5, [-66, 0, 10]), (0.75, [-70, 0, 10]), (1.1, Z)],
-            pos=[(0, Z), (0.3, [0, 1, 2]), (0.5, [1, -1, -2]), (1.1, Z)]),
-        "leftArm": bone_anim(
-            rot=[(0, [-140, 16, -16]), (0.3, [-174, 20, -18]), (0.5, [-60, 10, -10]), (0.75, [-64, 10, -10]), (1.1, Z)],
-            pos=[(0, [-2, 0, 0]), (0.5, [-3, -1, -2]), (1.1, Z)]),
-        "rightItem": bone_anim(rot=[(0, Z), (0.3, [12, 0, 0]), (0.5, [-20, 0, 0]), (1.1, Z)]),
-        "leftLeg": bone_anim(rot=[(0, Z), (0.5, [-30, 0, 0]), (1.1, Z)], pos=[(0, Z), (0.5, [0, 0, -3]), (1.1, Z)]),
-        "rightLeg": bone_anim(rot=[(0, Z), (0.5, [20, 0, 0]), (1.1, Z)]),
+    t = TIMING["echo_maul"]
+    a = {"idle": idle("maul", 0.8)}
+    # 1) golpe descendente pesado
+    a["attack"] = strike(*t[0], {
+        "root": {"pos": ([0, 1, 1], [0, -2.6, -1], [0, -2, -1])},
+        "waist": {"rot": ([-12, -4, 0], [19, 2, 0], [14, 2, 0])},
+        "body": {"rot": ([-18, -8, 0], [28, 4, 0], [20, 4, 0])},
+        "head": {"rot": ([14, 0, 0], [-16, 0, 0], [-9, 0, 0])},
+        "rightArm": {"rot": ([-184, -16, 18], [-66, 0, 10], [-58, 0, 10]),
+                     "pos": ([0, 1, 2], [1, -1, -2], [1, -1.3, -1.6])},
+        "leftArm": {"rot": ([-174, 20, -18], [-60, 10, -10], [-52, 10, -10]),
+                    "pos": ([-2, 1, 0], [-3, -1, -2], [-3, -1.3, -1.6])},
+        "rightItem": {"rot": ([14, 0, 0], [-20, 0, 0], [-26, 0, 0])},
+        "leftLeg": {"rot": ([8, 0, 0], [-32, 0, 0], [-24, 0, 0]), "pos": ([0, 0, 0], [0, 0, -3], [0, 0, -2.2])},
+        "rightLeg": {"rot": ([-6, 0, 0], [22, 0, 0], [16, 0, 0])},
     })
-    # barrido lateral
-    a["attack1"] = attack(1.0, {
-        "root": bone_anim(pos=[(0, Z), (0.45, [0, -1.5, -1]), (1.0, Z)]),
-        "waist": bone_anim(rot=[(0, [2, -26, 0]), (0.25, [2, -34, 0]), (0.45, [6, 28, 0]), (0.7, [4, 20, 0]), (1.0, Z)]),
-        "body": bone_anim(rot=[(0, [0, -36, 0]), (0.25, [-2, -46, 0]), (0.45, [8, 40, 0]), (0.7, [6, 26, 0]), (1.0, Z)]),
-        "head": bone_anim(rot=[(0, [0, 24, 0]), (0.45, [-6, -24, 0]), (1.0, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [-62, 72, 22]), (0.25, [-66, 86, 26]), (0.45, [-74, -58, 12]), (0.7, [-70, -48, 12]), (1.0, Z)],
-            pos=[(0, [0, 0, 2]), (0.45, [1, 0, -2]), (1.0, Z)]),
-        "leftArm": bone_anim(
-            rot=[(0, [-60, 52, 0]), (0.25, [-64, 62, 0]), (0.45, [-72, -38, 6]), (0.7, [-68, -30, 4]), (1.0, Z)],
-            pos=[(0, [-2, 0, 1]), (0.45, [-3, 0, -2]), (1.0, Z)]),
-        "rightItem": bone_anim(rot=[(0, [0, 0, 14]), (0.45, [0, 0, -18]), (1.0, Z)]),
-        "leftLeg": bone_anim(rot=[(0, [0, 14, 0]), (0.45, [-16, -10, 0]), (1.0, Z)]),
-        "rightLeg": bone_anim(rot=[(0, [0, 14, 0]), (0.45, [14, -10, 0]), (1.0, Z)]),
+    # 2) barrido lateral con todo el cuerpo
+    a["attack1"] = strike(*t[1], {
+        "root": {"pos": ([0, 0, 1], [0, -1.5, -1], [0, -1.2, -0.8])},
+        "waist": {"rot": ([2, -34, 0], [6, 16, 0], [5, 28, 0])},
+        "body": {"rot": ([-2, -46, 0], [8, 22, 0], [6, 40, 0])},
+        "head": {"rot": ([0, 28, 0], [-5, -14, 0], [-5, -26, 0])},
+        "rightArm": {"rot": ([-66, 86, 26], [-74, -24, 14], [-72, -58, 12]),
+                     "pos": ([0, 0, 2], [1, 0, -2], [1, 0, -1.6])},
+        "leftArm": {"rot": ([-64, 62, 0], [-72, -16, 5], [-70, -38, 6]),
+                    "pos": ([-2, 0, 1], [-3, 0, -2], [-3, 0, -1.6])},
+        "rightItem": {"rot": ([0, 0, 16], [0, 0, -8], [0, 0, -20])},
+        "leftLeg": {"rot": ([0, 16, 0], [-14, -6, 0], [-16, -10, 0])},
+        "rightLeg": {"rot": ([0, 16, 0], [12, -6, 0], [14, -10, 0])},
     })
-    # salto y golpe de tierra
-    a["attack2"] = attack(1.3, {
-        "root": bone_anim(pos=[(0, Z), (0.2, [0, -2, 0]), (0.4, [0, 4, -1]), (0.6, [0, -3, -2]), (0.9, [0, -2, -2]), (1.3, Z)]),
-        "waist": bone_anim(rot=[(0, [10, 0, 0]), (0.2, [14, 0, 0]), (0.4, [-14, 0, 0]), (0.6, [22, 0, 0]), (0.9, [16, 0, 0]), (1.3, Z)]),
-        "body": bone_anim(rot=[(0, [12, 0, 0]), (0.2, [18, 0, 0]), (0.4, [-18, 0, 0]), (0.6, [32, 0, 0]), (0.9, [24, 0, 0]), (1.3, Z)]),
-        "head": bone_anim(rot=[(0, [-8, 0, 0]), (0.4, [14, 0, 0]), (0.6, [-18, 0, 0]), (1.3, Z)]),
-        "rightArm": bone_anim(
-            rot=[(0, [20, 0, 14]), (0.2, [34, 0, 16]), (0.4, [-172, -6, 14]), (0.6, [-84, 0, 10]), (0.9, [-88, 0, 10]), (1.3, Z)],
-            pos=[(0, [0, 0, 1]), (0.4, [0, 1, 1]), (0.6, [1, -1, -3]), (1.3, Z)]),
-        "leftArm": bone_anim(
-            rot=[(0, [20, 0, -14]), (0.2, [34, 0, -16]), (0.4, [-162, 8, -14]), (0.6, [-78, 8, -10]), (0.9, [-82, 8, -10]), (1.3, Z)],
-            pos=[(0, [-2, 0, 1]), (0.6, [-3, -1, -3]), (1.3, Z)]),
-        "rightItem": bone_anim(rot=[(0, Z), (0.4, [14, 0, 0]), (0.6, [-24, 0, 0]), (1.3, Z)]),
-        "leftLeg": bone_anim(rot=[(0, [20, 0, 0]), (0.4, [-30, 0, 0]), (0.6, [-36, 0, 0]), (1.3, Z)], pos=[(0, Z), (0.6, [0, 0, -4]), (1.3, Z)]),
-        "rightLeg": bone_anim(rot=[(0, [20, 0, 0]), (0.4, [-20, 0, 0]), (0.6, [24, 0, 0]), (1.3, Z)]),
+    # 3) se agacha, salta y revienta el suelo
+    e = t[2][3]
+    a["attack2"] = attack(e, {
+        "root": {"pos": [(0, Z), (5, [0, -2.2, 0], "out"), (9, [0, 4, -1], "out"), (13, [0, -3, -2], "in"), (16, [0, -2.4, -2], "out"), (e, Z, "io")]},
+        "waist": {"rot": [(0, Z), (5, [14, 0, 0], "out"), (9, [-14, 0, 0], "out"), (13, [23, 0, 0], "in"), (16, [17, 0, 0], "out"), (e, Z, "io")]},
+        "body": {"rot": [(0, Z), (5, [18, 0, 0], "out"), (9, [-20, 0, 0], "out"), (13, [33, 0, 0], "in"), (16, [24, 0, 0], "out"), (e, Z, "io")]},
+        "head": {"rot": [(0, Z), (5, [-10, 0, 0], "out"), (9, [16, 0, 0], "out"), (13, [-20, 0, 0], "in"), (e, Z, "io")]},
+        "rightArm": {"rot": [(0, Z), (5, [34, 0, 16], "out"), (9, [-174, -6, 14], "out"), (13, [-84, 0, 10], "in"), (16, [-76, 0, 10], "out"), (e, Z, "io")],
+                     "pos": [(0, Z), (9, [0, 1, 1], "out"), (13, [1, -1, -3], "in"), (e, Z, "io")]},
+        "leftArm": {"rot": [(0, Z), (5, [34, 0, -16], "out"), (9, [-164, 8, -14], "out"), (13, [-78, 8, -10], "in"), (16, [-70, 8, -10], "out"), (e, Z, "io")],
+                    "pos": [(0, Z), (9, [-2, 1, 1], "out"), (13, [-3, -1, -3], "in"), (e, Z, "io")]},
+        "rightItem": {"rot": [(0, Z), (9, [16, 0, 0], "out"), (13, [-24, 0, 0], "in"), (16, [-30, 0, 0], "out"), (e, Z, "io")]},
+        "leftLeg": {"rot": [(0, Z), (5, [24, 0, 0], "out"), (9, [-30, 0, 0], "out"), (13, [-36, 0, 0], "in"), (e, Z, "io")],
+                    "pos": [(0, Z), (13, [0, 0, -4], "in"), (e, Z, "io")]},
+        "rightLeg": {"rot": [(0, Z), (5, [24, 0, 0], "out"), (9, [-20, 0, 0], "out"), (13, [26, 0, 0], "in"), (e, Z, "io")]},
     })
     return a
 

@@ -10,6 +10,9 @@
   brazos (eso hacia que la espada saliera "pegada" al cuerpo y de lado); solo
   deja la espada alineada con la mano con un balanceo sutil.
 
+OJO: no es idempotente. Hay que partir de las animaciones originales
+(git show 3f6e5df:resonance_armory/RP/animations/<arma>.animation.json).
+
 Uso: python3 tools/retime_attacks.py  (desde resonance_armory/)
 """
 import json
@@ -58,8 +61,23 @@ def scale_time(t: str, f: float) -> str:
     return s
 
 
+def _vec(v):
+    """Valor numerico de un keyframe (lista, o dict pre/post); None si es molang."""
+    if isinstance(v, dict):
+        v = v.get("post", v.get("pre"))
+    if isinstance(v, list) and all(isinstance(x, (int, float)) for x in v):
+        return v
+    return None
+
+
 def retime_channel(ch, f):
-    """ch: lista estatica, o dict tiempo->valor."""
+    """ch: lista estatica, o dict tiempo->valor.
+
+    Suavizado conservador: un keyframe lineal intermedio solo pasa a catmullrom
+    si NO es parte de una pausa (valor igual al vecino) y si los dos tramos que
+    lo rodean duran parecido. Con tramos muy desiguales catmullrom se pasa de
+    largo y el movimiento queda tosco, asi que ahi se deja lineal.
+    """
     if not isinstance(ch, dict):
         return ch
     items = sorted(ch.items(), key=lambda kv: float(kv[0]))
@@ -67,9 +85,14 @@ def retime_channel(ch, f):
     n = len(items)
     for i, (t, v) in enumerate(items):
         nt = scale_time(t, f)
-        # suavizado: keyframes intermedios lineales -> catmullrom
         if 0 < i < n - 1 and isinstance(v, list):
-            v = {"post": v, "lerp_mode": "catmullrom"}
+            pv, nv, cv = _vec(items[i - 1][1]), _vec(items[i + 1][1]), _vec(v)
+            d0 = float(t) - float(items[i - 1][0])
+            d1 = float(items[i + 1][0]) - float(t)
+            ratio = max(d0, d1) / max(1e-6, min(d0, d1))
+            hold = cv is None or pv is None or nv is None or cv == pv or cv == nv
+            if not hold and ratio <= 2.0:
+                v = {"post": v, "lerp_mode": "catmullrom"}
         out[nt] = v
     return out
 

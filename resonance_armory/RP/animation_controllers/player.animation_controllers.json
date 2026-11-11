@@ -212,7 +212,7 @@
               "first_person_shield_block": "query.blocking"
             },
             {
-              "first_person_attack_controller": "variable.attack_time > 0.0 && query.get_equipped_item_name != 'filled_map' && !variable.melee_spear_equipped"
+              "first_person_attack_controller": "variable.attack_time > 0.0 && query.get_equipped_item_name != 'filled_map' && !variable.melee_spear_equipped && !query.is_item_name_any('slot.weapon.mainhand', 0, 'resonance:smoke_club', 'resonance:iron_halberd', 'resonance:golden_rapier', 'resonance:copper_hammer', 'resonance:diamond_greatsword', 'resonance:netherite_relic_blade', 'resonance:redstone_pulse_gauntlet', 'resonance:lunar_crescent', 'resonance:amethyst_glaive', 'resonance:blaze_scimitar', 'resonance:echo_maul')"
             },
             {
               "first_person_empty_hand": "query.get_equipped_item_name(0, 1) != 'filled_map'"
