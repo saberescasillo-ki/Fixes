@@ -234,6 +234,10 @@ function getTargetsInCone(player, range, coneDeg, maxTargets) {
       if (results.length >= maxTargets) break;
     }
   }
+  try {
+    drawAttackCone(player, range, coneDeg, results);
+  } catch {
+  }
   return results;
 }
 
@@ -423,6 +427,7 @@ function triggerSmokeSpecial(attacker, primaryTarget) {
   withCooldown(attacker, "smoke_club_special", SPECIAL_COOLDOWN_TICKS, () => {
     spawnSmoke(primaryTarget.dimension, primaryTarget.location, SMOKE_PARTICLE_COUNT);
     applyAreaEffect(primaryTarget.dimension, primaryTarget.location, SMOKE_RADIUS, [...SMOKE_EFFECTS], attacker);
+    drawAreaRadius(attacker, primaryTarget.location, SMOKE_RADIUS);
   });
 }
 function tickWeapon(player) {
@@ -900,6 +905,7 @@ function tryShock(player, primaryTarget, state) {
   const wet = isWet(player) || isWet(primaryTarget);
   const shockDamage = wet ? SHOCK_DAMAGE_WET : SHOCK_DAMAGE_BASE;
   const radius = wet ? SHOCK_RADIUS_WET : SHOCK_RADIUS_BASE;
+  drawAreaRadius(player, primaryTarget.location, radius);
   const nearby = primaryTarget.dimension.getEntities({ location: primaryTarget.location, maxDistance: radius }) || [];
   for (const e of nearby) {
     if (!e || e.id === player.id || e.id === primaryTarget.id) continue;
@@ -2277,6 +2283,7 @@ function triggerChimeBurst(player, target) {
     const dim = target.dimension;
     dealDamage(target, CHIME_DAMAGE, { cause: EntityDamageCause9.magic, damagingEntity: player });
     const nearby = dim.getEntities({ location: target.location, maxDistance: CHIME_RADIUS, excludeTypes: NON_TARGET_TYPES }) || [];
+    drawAreaRadius(player, target.location, CHIME_RADIUS);
     for (const e of nearby) {
       if (!e || e.id === player.id || e.id === target.id) continue;
       if (!e.getComponent?.("minecraft:health")) continue;
@@ -2470,6 +2477,7 @@ function triggerEmberBurst(player, primaryTarget, state) {
     const dim = primaryTarget.dimension;
     const dmg = stacks * EMBER_BURST_DAMAGE_PER_STACK;
     const nearby = dim.getEntities({ location: primaryTarget.location, maxDistance: EMBER_BURST_RADIUS, excludeTypes: NON_TARGET_TYPES }) || [];
+    drawAreaRadius(player, primaryTarget.location, EMBER_BURST_RADIUS);
     for (const e of nearby) {
       if (!e || e.id === player.id) continue;
       if (!e.getComponent?.("minecraft:health")) continue;
@@ -2649,6 +2657,7 @@ function triggerSonicBoom(player) {
     const dim = player.dimension;
     const center = player.location;
     const nearby = dim.getEntities({ location: center, maxDistance: BOOM_RADIUS, excludeTypes: NON_TARGET_TYPES }) || [];
+    drawAreaRadius(player, center, BOOM_RADIUS);
     for (const e of nearby) {
       if (!e || e.id === player.id) continue;
       if (!e.getComponent?.("minecraft:health")) continue;
@@ -2715,6 +2724,172 @@ onWeaponHit((ev) => {
   });
 });
 system14.runInterval(() => world11.getPlayers().forEach(safeTick(tickWeapon11)), 1);
+
+// scripts/systems/hitbox_debug.ts
+// Menu de opciones de la armeria + visualizacion de las hitbox de ataque.
+// Los ajustes son por jugador (propiedad dinamica) y las particulas se envian
+// solo al jugador que las activo (player.spawnParticle), asi no molesta a nadie.
+import { ModalFormData, FormCancelationReason } from "@minecraft/server-ui";
+import { system as systemDbg, world as worldDbg } from "@minecraft/server";
+var SETTINGS_ITEM_ID = "resonance:armory_settings";
+var SETTINGS_KEY = "res_armory_settings";
+var SCRIPTEVENT_MENU_ID = "resonance:menu";
+var HITBOX_COLORS = [
+  { label: "Verde", particle: "minecraft:villager_happy" },
+  { label: "Blanco (End Rod)", particle: "minecraft:endrod" },
+  { label: "Fuego", particle: "minecraft:basic_flame_particle" },
+  { label: "Azul (fuego de almas)", particle: "minecraft:blue_flame_particle" }
+];
+var HIT_MARKER_PARTICLE = "minecraft:villager_angry";
+var AREA_PARTICLE = "minecraft:blue_flame_particle";
+var MAX_CONE_HEIGHT = 2.5;
+var DEFAULT_SETTINGS = {
+  showHitbox: false,
+  showHitMarkers: true,
+  showAreaRadius: true,
+  showHeightLimits: false,
+  colorIndex: 0,
+  density: 3
+};
+var settingsCache = /* @__PURE__ */ new Map();
+function getArmorySettings(player) {
+  const cached = settingsCache.get(player.id);
+  if (cached) return cached;
+  let s = { ...DEFAULT_SETTINGS };
+  try {
+    const raw = player.getDynamicProperty(SETTINGS_KEY);
+    if (typeof raw === "string") s = { ...s, ...JSON.parse(raw) };
+  } catch {
+  }
+  settingsCache.set(player.id, s);
+  return s;
+}
+function saveArmorySettings(player, s) {
+  settingsCache.set(player.id, s);
+  try {
+    player.setDynamicProperty(SETTINGS_KEY, JSON.stringify(s));
+  } catch {
+  }
+}
+function debugParticle(player, id, loc) {
+  try {
+    player.spawnParticle(id, loc);
+  } catch {
+    try {
+      player.dimension.spawnParticle(id, loc);
+    } catch {
+    }
+  }
+}
+// separacion entre particulas segun la densidad (1 = pocas, 5 = muchas)
+var spacingFor = (s) => [0.9, 0.7, 0.5, 0.38, 0.28][Math.max(0, Math.min(4, (s.density ?? 3) - 1))];
+// throttle: como mucho un dibujo de cono cada 2 ticks por jugador
+var lastConeDraw = /* @__PURE__ */ new Map();
+function drawAttackCone(player, range, coneDeg, targets) {
+  const s = getArmorySettings(player);
+  if (!s.showHitbox) return;
+  const tick = systemDbg.currentTick;
+  if (tick - (lastConeDraw.get(player.id) ?? -99) < 2) return;
+  lastConeDraw.set(player.id, tick);
+  const particle = (HITBOX_COLORS[s.colorIndex] ?? HITBOX_COLORS[0]).particle;
+  const spacing = spacingFor(s);
+  const o = player.location;
+  const view = player.getViewDirection();
+  const flatLen = Math.sqrt(view.x * view.x + view.z * view.z);
+  const fx = flatLen > 1e-3 ? view.x / flatLen : 0;
+  const fz = flatLen > 1e-3 ? view.z / flatLen : 1;
+  const yaw = Math.atan2(fz, fx);
+  const full = coneDeg >= 359;
+  const half = Math.min(Math.PI, coneDeg * Math.PI / 180 / 2);
+  const heights = s.showHeightLimits ? [0.15, MAX_CONE_HEIGHT, -MAX_CONE_HEIGHT + 0.15] : [0.15];
+  for (const h of heights) {
+    const y = o.y + h;
+    // arco exterior (alcance maximo)
+    const arcLen = range * half * 2;
+    const arcSteps = Math.max(4, Math.ceil(arcLen / spacing));
+    for (let i = 0; i <= arcSteps; i++) {
+      const a = yaw - half + 2 * half * i / arcSteps;
+      debugParticle(player, particle, { x: o.x + Math.cos(a) * range, y, z: o.z + Math.sin(a) * range });
+    }
+    if (full) continue;
+    // bordes laterales del cono
+    const radSteps = Math.max(2, Math.ceil(range / spacing));
+    for (const a of [yaw - half, yaw + half]) {
+      for (let i = 1; i < radSteps; i++) {
+        const r = range * i / radSteps;
+        debugParticle(player, particle, { x: o.x + Math.cos(a) * r, y, z: o.z + Math.sin(a) * r });
+      }
+    }
+  }
+  if (s.showHitMarkers) {
+    for (const t of targets) {
+      try {
+        debugParticle(player, HIT_MARKER_PARTICLE, { x: t.location.x, y: t.location.y + 2.1, z: t.location.z });
+      } catch {
+      }
+    }
+  }
+}
+// Radio de habilidades en area (humo, descarga, campanada, brasas, boom...)
+function drawAreaRadius(player, center, radius) {
+  if (!player || player.typeId !== "minecraft:player") return;
+  const s = getArmorySettings(player);
+  if (!s.showHitbox || !s.showAreaRadius) return;
+  const spacing = spacingFor(s);
+  const steps = Math.max(8, Math.ceil(2 * Math.PI * radius / spacing));
+  for (let i = 0; i < steps; i++) {
+    const a = 2 * Math.PI * i / steps;
+    debugParticle(player, AREA_PARTICLE, { x: center.x + Math.cos(a) * radius, y: center.y + 0.2, z: center.z + Math.sin(a) * radius });
+  }
+}
+async function openArmoryMenu(player) {
+  const s = getArmorySettings(player);
+  const form = new ModalFormData().title("Resonance Armory - Opciones").toggle("Ver hitbox de ataque", { defaultValue: s.showHitbox, tooltip: "Dibuja con particulas el area (alcance y angulo) de cada golpe de las armas Resonance." }).toggle("Marcar enemigos alcanzados", { defaultValue: s.showHitMarkers }).toggle("Ver radio de habilidades en area", { defaultValue: s.showAreaRadius, tooltip: "Humo, descarga, campanada, explosion de brasas, sonic boom..." }).toggle("Ver limites de altura del golpe", { defaultValue: s.showHeightLimits, tooltip: "El golpe solo alcanza a entidades a menos de 2.5 bloques de altura de diferencia." }).dropdown("Color de la hitbox", HITBOX_COLORS.map((c) => c.label), { defaultValueIndex: s.colorIndex }).slider("Densidad de particulas", 1, 5, { defaultValue: s.density, valueStep: 1 });
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const res = await form.show(player);
+    if (res.canceled) {
+      // con el chat abierto (p. ej. al usar /scriptevent) el formulario no se
+      // puede mostrar todavia: se reintenta hasta que el jugador lo cierre
+      if (res.cancelationReason === FormCancelationReason.UserBusy) {
+        await new Promise((r) => systemDbg.runTimeout(r, 5));
+        continue;
+      }
+      return;
+    }
+    const [showHitbox, showHitMarkers, showAreaRadius, showHeightLimits, colorIndex, density] = res.formValues ?? [];
+    saveArmorySettings(player, {
+      showHitbox: !!showHitbox,
+      showHitMarkers: !!showHitMarkers,
+      showAreaRadius: !!showAreaRadius,
+      showHeightLimits: !!showHeightLimits,
+      colorIndex: typeof colorIndex === "number" ? colorIndex : 0,
+      density: typeof density === "number" ? density : 3
+    });
+    try {
+      player.sendMessage(showHitbox ? "\xA7a[Resonance] Hitbox de ataque: ACTIVADA" : "\xA77[Resonance] Hitbox de ataque: desactivada");
+    } catch {
+    }
+    return;
+  }
+}
+function tryOpenMenu(player) {
+  openArmoryMenu(player).catch((e) => console.warn(`[Resonance] menu: ${e}`));
+}
+// 1) objeto "Opciones de la Armeria": click derecho
+worldDbg.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
+  if (!source || source.typeId !== "minecraft:player" || !itemStack) return;
+  if (itemStack.typeId === SETTINGS_ITEM_ID) tryOpenMenu(source);
+});
+// 2) comando: /scriptevent resonance:menu
+systemDbg.afterEvents.scriptEventReceive.subscribe((ev) => {
+  if (ev.id !== SCRIPTEVENT_MENU_ID) return;
+  const p = ev.sourceEntity;
+  if (p && p.typeId === "minecraft:player") tryOpenMenu(p);
+});
+worldDbg.afterEvents.playerLeave.subscribe(({ playerId }) => {
+  settingsCache.delete(playerId);
+  lastConeDraw.delete(playerId);
+});
 
 // scripts/systems/session.ts
 var ALL_STATE_KEYS = [STATE_KEY, STATE_KEY2, STATE_KEY3, STATE_KEY4, STATE_KEY5, STATE_KEY6, STATE_KEY7, STATE_KEY8, STATE_KEY9, STATE_KEY10, STATE_KEY11];

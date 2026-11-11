@@ -34,6 +34,9 @@
     },
     "resonance_echo_maul": {
       "textures": "textures/items/echo_maul"
+    },
+    "resonance_armory_settings": {
+      "textures": "textures/items/armory_settings"
     }
   }
 }
